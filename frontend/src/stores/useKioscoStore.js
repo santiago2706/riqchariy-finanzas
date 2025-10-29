@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // Archivo: stores/useKioscoStore.js
 
 import { ref, computed } from 'vue'; // <--- ¡CAMBIO 1: IMPORTAR COMPUTED!
@@ -110,4 +111,80 @@ export const useKioscoStore = defineStore('kiosco', () => {
         inventoryValue,
         netWorth
     };
+=======
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
+
+// 1. IMPORTAMOS NUESTRA API FALSA DEL KIOSCO
+// (¡Usando el camino relativo que SÍ funciona!)
+import { fetchProductsByRegion } from '../services/kioscoApi.js';
+
+// >> AÑADE ESTA LÍNEA <<
+import { useMarketStore } from '../services/useMarketStore.js';
+
+// 'kiosco' es el ID de este cerebro
+export const useKioscoStore = defineStore('kiosco', () => {
+
+  // --- 2. ESTADO (Los datos del juego) ---
+  const saldo = ref(100.00); // Saldo inicial
+  const products = ref([]); // Productos del JSON [cite: 215]
+  const inventory = ref([]); // Inventario del jugador [cite: 214]
+  const isLoading = ref(false); // Para mostrar un "Cargando..."
+  // >> AÑADE ESTA LÍNEA (Activamos el Economista) <<
+  const marketStore = useMarketStore();
+
+  // --- 3. ACCIONES (Las funciones del juego) ---
+
+  /**
+   * Carga los productos de la API Falsa
+   */
+  async function loadProducts(region) {
+    isLoading.value = true;
+    try {
+      // 4. Llama a nuestra API FALSA (la de services/kioscoApi.js)
+      const data = await fetchProductsByRegion(region);
+      // >> NUEVO PASO CRÍTICO <<
+      marketStore.setProducts(data);
+      products.value = data;
+    } catch (error) {
+      console.error("Error al cargar productos:", error);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /**
+   * Lógica para comprar un producto [cite: 198]
+   */
+  function buyProduct(product, quantity) {
+    // El Kiosco debe buscar el producto en la lista del Economista para obtener el precio actual
+    const currentMarketProduct = marketStore.products.find(p => p.id === product.id);
+
+    // Verificación (por seguridad)
+    if (!currentMarketProduct) {
+        console.error("Producto no encontrado en el Market Store.");
+        return; 
+    }
+
+    const cost = currentMarketProduct.price * quantity; // Usamos .price, no .cost!
+    //const cost = product.cost * quantity;
+    if (saldo.value >= cost) {
+      saldo.value -= cost;
+      // (Aquí iría la lógica de añadir al inventario)
+      console.log(`Comprados ${quantity} de ${product.name}`);
+    } else {
+      alert("¡Saldo insuficiente!");
+    }
+  }
+
+  // --- 5. Devolvemos todo para que los componentes lo usen ---
+  return {
+    saldo,
+    products,
+    inventory,
+    isLoading,
+    loadProducts,
+    buyProduct
+  };
+>>>>>>> 0377930 (feat: Versión inicial con vista de kiosco funcional)
 });

@@ -2,11 +2,17 @@
 // 1. Importamos AMBOS cerebros aquí, arriba del todo
 import { useAuthStore } from '../stores/useAuthStore.js';
 import { useKioscoStore } from '../stores/useKioscoStore.js';
+<<<<<<< HEAD
+=======
+import KioscoModule from '../components/KioskoModule.vue';
+
+>>>>>>> 0377930 (feat: Versión inicial con vista de kiosco funcional)
 
 // 2. El HomeView (padre) SOLO necesita el authStore
 const authStore = useAuthStore();
 
 // 3. DEFINIMOS KioscoModule AQUÍ MISMO (temporalmente)
+<<<<<<< HEAD
 const KioscoModule = {
   setup() {
     // El Kiosco usa AMBAS importaciones.
@@ -43,6 +49,8 @@ const KioscoModule = {
     </div>
   `
 };
+=======
+>>>>>>> 0377930 (feat: Versión inicial con vista de kiosco funcional)
 
 // 4. DEFINIMOS ProyectoModule AQUÍ MISMO (temporalmente)
 const ProyectoModule = {
@@ -54,8 +62,16 @@ const ProyectoModule = {
     </div>
   `
 };
+<<<<<<< HEAD
 </script>
 
+=======
+
+</script>
+
+
+
+>>>>>>> 0377930 (feat: Versión inicial con vista de kiosco funcional)
 <template>
   <div v-if="authStore.user" class="min-h-screen bg-gray-100">
     <nav class="bg-white shadow-md">
@@ -91,8 +107,12 @@ const ProyectoModule = {
       <div v-else-if="authStore.user.level === 'arbol'" class="space-y-4">
         <h2 class="text-3xl font-semibold text-gray-800">🌳 Nivel Árbol</h2>
         <p>Próximamente: ¡Módulos de Inversión!</p>
+<<<<<<< HEAD
       </div>
 
+=======
+      </div>  
+>>>>>>> 0377930 (feat: Versión inicial con vista de kiosco funcional)
     </main>
   </div>
   <div v-else class="flex items-center justify-center min-h-screen">
