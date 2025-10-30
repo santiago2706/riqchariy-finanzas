@@ -1,6 +1,8 @@
+// Archivo: frontend/postcss.config.js
+
 export default {
   plugins: {
-    '@tailwindcss/postcss': {}, // <-- Esta es la nueva forma de llamarlo
+    '@tailwindcss/postcss': {}, // ¡ESTE ES EL NOMBRE CORRECTO DEL PLUGIN!
     'autoprefixer': {},
   },
 }

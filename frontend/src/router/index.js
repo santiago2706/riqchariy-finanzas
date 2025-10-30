@@ -2,7 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
-import KioscoView from '../views/KioscoView.vue'; // <-- 1. AÑADIDO ESTE IMPORT
+import KioscoView from '../views/KioscoView.vue';
+import DashboardView from '../views/DashboardView.vue'; // <--- ¡AÑADIDO EL IMPORT DEL DASHBOARD!
 
 // 1. Importamos el cerebro de Auth para saber si el usuario está logueado
 import { useAuthStore } from '../stores/useAuthStore.js';
@@ -27,16 +28,21 @@ const router = createRouter({
       name: 'register',
       component: RegisterView,
       meta: { requiresGuest: true } // Si ya está logueado, no puede ver esto
-    }, // <-- AÑADIDA ESTA COMA
+    },
 
-    // --- 2. AÑADIDO ESTE BLOQUE COMPLETO ---
+    // --- RUTAS DEL JUEGO ---
+    {
+      path: '/dashboard', // <--- ¡NUEVA RUTA!
+      name: 'dashboard',
+      component: DashboardView,
+      meta: { requiresAuth: true }
+    },
     {
       path: '/kiosco',
       name: 'kiosco',
       component: KioscoView,
       meta: { requiresAuth: true }
     }
-    // --- FIN DEL BLOQUE AÑADIDO ---
   ]
 });
 
