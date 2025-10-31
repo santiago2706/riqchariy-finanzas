@@ -2,47 +2,13 @@
 // 1. Importamos AMBOS cerebros aquí, arriba del todo
 import { useAuthStore } from '../stores/useAuthStore.js';
 import { useKioscoStore } from '../stores/useKioscoStore.js';
+import KioscoModule from '../components/KioskoModule.vue';
+
 
 // 2. El HomeView (padre) SOLO necesita el authStore
 const authStore = useAuthStore();
 
 // 3. DEFINIMOS KioscoModule AQUÍ MISMO (temporalmente)
-const KioscoModule = {
-  setup() {
-    // El Kiosco usa AMBAS importaciones.
-    const kiosco = useKioscoStore();
-    const auth = useAuthStore();
-
-    // Cargamos los productos usando la región del usuario
-    // Añadimos una comprobación por si 'auth.user' aún no está listo
-    if (auth.user && auth.user.region) {
-      kiosco.loadProducts(auth.user.region);
-    } else {
-      console.warn("HomeView: No se pudo cargar la región del usuario aún.");
-      // Opcional: cargar productos de una región por defecto o mostrar error
-    }
-
-    return { kiosco, auth };
-  },
-  template: `
-    <div class="p-6 bg-white rounded-lg shadow-lg">
-      <h3 class="text-2xl font-bold text-green-600">Módulo: Mi Kiosco Interactivo</h3>
-      <p class="mb-4">¡Bienvenido a tu tienda!</p>
-      <div v-if="auth.user" class="text-lg font-medium">Tu Saldo: <span class="text-green-700">S/ {{ kiosco.saldo.toFixed(2) }}</span></div>
-
-      <div v-if="kiosco.isLoading" class="mt-4">Cargando productos...</div>
-      <div v-else-if="auth.user" class="mt-4 space-y-2">
-        <h4 class="font-bold">Productos para {{ auth.user.region }}:</h4>
-        <div v-for="product in kiosco.products" :key="product.id" class="flex items-center justify-between p-2 border rounded">
-          <span>
-            {{ product.name }} - Costo: S/ {{ product.cost.toFixed(2) }}
-          </span>
-          <button @click="kiosco.buyProduct(product, 1)" class="px-2 py-1 ml-2 text-xs text-white bg-blue-500 rounded hover:bg-blue-700">Comprar 1</button>
-        </div>
-      </div>
-    </div>
-  `
-};
 
 // 4. DEFINIMOS ProyectoModule AQUÍ MISMO (temporalmente)
 const ProyectoModule = {
@@ -54,7 +20,10 @@ const ProyectoModule = {
     </div>
   `
 };
+
 </script>
+
+
 
 <template>
   <div v-if="authStore.user" class="min-h-screen bg-gray-100">

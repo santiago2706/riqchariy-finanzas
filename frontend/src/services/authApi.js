@@ -13,7 +13,9 @@ export const login = async (email, password) => {
             user: {
                 id: 1,
                 email,
-                name: "Usuario Demo"
+                name: "Usuario Demo",
+                region: "Lima",//Acá iría la region del usuario traido del Api
+                level: "semilla"//Acá iría el nivel del usuario traido del Api
             },
             token: "fake-jwt-token-" + Date.now(),
             message: "Login exitoso"
