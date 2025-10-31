@@ -36,12 +36,7 @@ const router = createRouter({
       component: DashboardView,
       meta: { requiresAuth: true }
     },
-    {
-      path: '/kiosco',
-      name: 'kiosco',
-      component: KioscoView,
-      meta: { requiresAuth: true }
-    }
+
   ]
 });
 
