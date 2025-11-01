@@ -1,30 +1,38 @@
 <template>
   <div>
     <h1>¡Este es el Kiosco!</h1>
-    <p>Tu saldo: <strong>${{ kiosco.saldo?.toFixed(2) }}</strong></p>
+    <p>Tu saldo: <strong>${{ kiosco?.saldo?.toFixed(2) }}</strong></p>
 
     <div style="background-color: #ffc; border: 1px solid #e6db55; padding: 10px; margin-top: 15px; margin-bottom: 15px;">
       <strong>⚙️ Verificación del Motor de Mercado:</strong>
-      <p>Día actual: {{ market.day }}</p>
-      <button 
-        @click="market.advanceDay()" 
+      <p>Día actual: {{ market?.day }}</p>
+      <button
+        @click="market?.advanceDay()"
         style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">
-        Forzar Avance de Día (Probar Cambio de Precios)
+        Forzar Avance de Día
       </button>
     </div>
 
+    <div style="margin: 20px 0;">
+      <button
+        @click="transaction?.endDayAndSave()"
+        :disabled="transaction?.isLoading"
+        style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%;"
+      >
+        {{ transaction?.isLoading ? 'Guardando...' : 'Terminar Día y Guardar Progreso' }}
+      </button>
+    </div>
     <hr>
-
-    <div v-if="kiosco.isLoading">
+    <div v-if="kiosco?.isLoading">
       <p>Cargando productos...</p>
     </div>
 
-    <div v-else-if="market.products.length > 0">
-      <h2>Nuestros Productos (Región: {{ auth.user.region }}):</h2>
+    <div v-else-if="market?.products?.length > 0">
+      <h2>Nuestros Productos (Región: {{ auth?.user?.region }}):</h2>
       <ul>
         <li v-for="product in market.products" :key="product.id">
           <span>{{ product.name }} - <strong>${{ product.price?.toFixed(2) }}</strong></span>
-          <button @click="kiosco.buyProduct(product, 1)">Comprar 1</button>
+          <button @click="kiosco?.buyProduct(product, 1)">Comprar 1</button>
         </li>
       </ul>
     </div>
@@ -37,62 +45,33 @@
 </template>
 
 <script setup>
+// ¡EL ARREGLO DEL BUCLE! Importamos 'shallowRef'
+import { onMounted, shallowRef } from 'vue';
 import { useKioscoStore } from '../stores/useKioscoStore';
-import { onMounted } from 'vue'; // Se ejecuta 1 vez cuando la página carga
-import { useMarketStore } from '../services/useMarketStore'; // 1. AGREGADO: El Economista
-import { useAuthStore } from '../stores/useAuthStore';     // 2. AGREGADO: Para la región
+import { useMarketStore } from '../services/useMarketStore'; // El de tu compañero
+import { useAuthStore } from '../stores/useAuthStore';
+// --- 1. IMPORTA TU NUEVO STORE ---
+import { useTransactionStore } from '../stores/useTransactionStore';
 
-const kiosco = useKioscoStore();
-const auth = useAuthStore();    
-const market = useMarketStore();
+// 2. Define contenedores vacíos.
+const kiosco = shallowRef(null);
+const auth = shallowRef(null);
+const market = shallowRef(null);
+// --- 3. AÑADE EL CONTENEDOR DE TRANSACCIÓN ---
+const transaction = shallowRef(null);
 
-// ¡LA CLAVE! Le decimos al store que cargue los productos
-// en cuanto la página esté lista.
+// 4. Llena los contenedores solo cuando el componente esté listo.
+// Esto rompe el bucle de importación circular.
 onMounted(() => {
-  // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-  //Pedimos la region real al usuario. Actualmente el usuario es demo
-  if (auth.user && auth.user.region) {
-    kiosco.loadProducts(auth.user.region);
+  kiosco.value = useKioscoStore();
+  auth.value = useAuthStore();
+  market.value = useMarketStore();
+  transaction.value = useTransactionStore(); // <-- ¡Llena tu store!
+
+  if (auth.value.user && auth.value.user.region) {
+    kiosco.value.loadProducts(auth.value.user.region);
   } else {
     console.error("KioscoView: No se pudo encontrar la región del usuario.");
   }
 });
 </script>
-
-<style scoped>
-/* Estilos para que se vea ordenado */
-h1 {
-  color: #42b983; /* Verde Vue */
-}
-h2 {
-  margin-top: 20px;
-}
-ul {
-  list-style: none;
-  padding: 0;
-}
-li {
-  background-color: #f4f4f4;
-  padding: 10px 15px;
-  margin-bottom: 8px;
-  border-radius: 5px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-span {
-  font-size: 1.1em;
-}
-button {
-  background-color: #42b983;
-  color: white;
-  border: none;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-button:hover {
-  background-color: #369b71;
-}
-</style>
