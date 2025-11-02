@@ -16,21 +16,16 @@ const INITIAL_PRODUCTS = [
 // Creamos y exportamos nuestro Store
 export const useMarketStore = defineStore('market', {
     // === EL ESTADO (STATE) ===
-    // Analogía: Los datos que guarda el Gerente en su escritorio.
     state: () => ({
         day: 1, // Controla el "día del juego"
         products: INITIAL_PRODUCTS, // La lista de productos y sus valores.
-
         isUpdating: false // Un "candado" para evitar que la API se llame 10 veces
-
     }),
 
     // === ACCIONES (ACTIONS) ===
-    // Analogía: Las tareas que el Gerente puede ejecutar.
     actions: {
         /**
          * Permite que otro store (Kiosco) cargue los productos iniciales.
-         * @param {Product[]} initialProducts
          */
         setProducts(initialProducts) {
             // Reemplaza la lista inicial dura con los datos de la API.
@@ -40,12 +35,12 @@ export const useMarketStore = defineStore('market', {
          * Llama al servicio de simulación para avanzar el día.
          */
         async advanceDay() {
-            // 1. Si el candado está puesto (ya estamos actualizando), no hagas nada.
+            // 1. Si el candado está puesto... no hagas nada.
             if (this.isUpdating) {
                 console.log("¡Espera! El mercado ya se está actualizando.");
                 return;
             }
-                
+
             // 2. Pon el candado
             this.isUpdating = true;
 
@@ -53,32 +48,41 @@ export const useMarketStore = defineStore('market', {
                 // 3. Obtenemos el contexto (la región) del AuthStore
                 const authStore = useAuthStore();
                 const region = authStore.user ? authStore.user.region : 'default';
-                
+
                 // 4. Incrementamos el día
                 this.day += 1;
 
                 // 5. ¡LA LLAMADA! (El Teléfono)
-                // Usamos la API simulada, pasándole los productos actuales y la región.
                 const updatedProducts = await fetchUpdatedPrices(this.products, region);
 
                 // 6. Reemplazamos la lista vieja con la nueva
                 this.products = updatedProducts;
-                
+
                 console.log(`¡Día ${this.day} avanzado! Precios actualizados desde la API.`);
 
             } catch (error) {
                 console.error("Error al actualizar precios desde la API (simulada):", error);
             } finally {
-                // 7. Quita el candado, pase lo que pase
+                // 7. Quita el candado
                 this.isUpdating = false;
             }
         },
+
+        // --- ¡NUEVA FUNCIÓN (PASO 3B - TU TAREA)! ---
+        /**
+         * (TAREA LÍDER) Sobrescribe el día inicial con datos guardados.
+         */
+        loadState(savedDay) {
+          console.log("[Market Store]: Cargando día guardado...");
+          // (Nota: Tu Dev 4 y Dev 2 tienen lógica de "día" duplicada.
+          // Por ahora, actualizaremos ambas.)
+          this.day = savedDay;
+        }
+        // --- FIN DE LA NUEVA FUNCIÓN ---
     },
-    
+
     // === GETTERS (Opcional, pero útil) ===
-    // Analogía: Información derivada que el Gerente puede calcular rápidamente.
     getters: {
-        // Por ejemplo, calcular cuántos productos tenemos
         productCount: (state) => state.products.length,
     }
 });
