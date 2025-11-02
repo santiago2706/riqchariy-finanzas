@@ -1,3 +1,26 @@
+<script setup>
+import { useKioscoStore } from '../stores/useKioscoStore';
+import { onMounted } from 'vue'; // Se ejecuta 1 vez cuando la página carga
+import { useMarketStore } from '../services/useMarketStore'; // 1. AGREGADO: El Economista
+import { useAuthStore } from '../stores/useAuthStore';     // 2. AGREGADO: Para la región
+
+const kiosco = useKioscoStore();
+const auth = useAuthStore();    
+const market = useMarketStore();
+
+// ¡LA CLAVE! Le decimos al store que cargue los productos
+// en cuanto la página esté lista.
+onMounted(() => {
+  // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
+  //Pedimos la region real al usuario. Actualmente el usuario es demo
+  if (auth.user && auth.user.region) {
+    kiosco.loadProducts(auth.user.region)
+  } else {
+    console.error("KioscoView: No se pudo encontrar la región del usuario.");
+  }
+});
+</script>
+
 <template>
   <div>
     <h1>¡Este es el Kiosco!</h1>
@@ -5,12 +28,11 @@
 
     <div style="background-color: #ffc; border: 1px solid #e6db55; padding: 10px; margin-top: 15px; margin-bottom: 15px;">
       <strong>⚙️ Verificación del Motor de Mercado:</strong>
-      <p>Día actual: {{ market?.day }}</p>
-      <button
-        @click="onAdvanceDay"
-        style="background-color:#007bff;color:#fff;padding:5px 10px;border:none;border-radius:5px;cursor:pointer;"
-      >
-        Forzar Avance de Día
+      <p>Día actual: {{ market.day }}</p>
+      <button 
+        @click="market.advanceDay()" 
+        class="bg-blue-600 text-white py-1 px-2.5 rounded-md cursor-pointer border-none hover:bg-blue-700">
+        Forzar Avance de Día (Probar Cambio de Precios)
       </button>
 
 
@@ -24,6 +46,19 @@
     >
       {{ transaction?.isLoading ? 'Guardando...' : 'Terminar Día y Guardar Progreso' }}
     </button>
+    <div 
+      v-if="market.marketEvents.length > 0" 
+      class="bg-amber-50 border border-amber-200 p-2.5 mt-4 rounded-md"
+    >
+      <h3 class="font-bold text-amber-700">¡Eventos del Mercado!</h3>
+      <ul class="list-disc pl-5">
+        <li v-for="(event, index) in market.marketEvents" :key="index" style="color: #d48806;">
+          {{ event.message }}
+        </li>
+      </ul>
+    </div>
+
+    <hr>
 
 
     </div>

@@ -5,13 +5,13 @@ import { defineStore } from 'pinia';
 
 // 1. IMPORTAMOS NUESTRA API FALSA DEL KIOSCO
 import { fetchProductsByRegion } from '../services/kioscoApi.js';
+import { useMarketStore } from '../services/useMarketStore.js';
 
 // 'kiosco' es el ID de este cerebro
 export const useKioscoStore = defineStore('kiosco', () => {
 
     // --- 2. ESTADO (Los datos del juego) ---
     const saldo = ref(100.00); // Saldo inicial
-    const products = ref([]); // Productos del JSON
     const inventory = ref([]); // Inventario del jugador { product: {}, quantity: 0 }
     const isLoading = ref(false); // Para mostrar un "Cargando..."
 
@@ -25,6 +25,7 @@ export const useKioscoStore = defineStore('kiosco', () => {
      * Carga los productos de la API Falsa
      */
     async function loadProducts(region) {
+        const marketStore = useMarketStore();
         isLoading.value = true;
         try {
             const data = await fetchProductsByRegion(region);
@@ -60,10 +61,9 @@ export const useKioscoStore = defineStore('kiosco', () => {
             console.log(`Comprados ${quantity} de ${product.name}. Saldo: ${saldo.value.toFixed(2)}`);
             return true;
         } else {
-            alert("¡Saldo insuficiente!");
-            return false;
+          alert("¡Saldo insuficiente!");
         }
-    }
+        }
 
     /**
      * Lógica para vender un producto
@@ -142,7 +142,6 @@ export const useKioscoStore = defineStore('kiosco', () => {
     // --- 5. Devolvemos todo para que los componentes lo usen ---
     return {
         saldo,
-        products,
         inventory,
         isLoading,
         loadProducts,
