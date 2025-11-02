@@ -28,7 +28,14 @@ export const useKioscoStore = defineStore('kiosco', () => {
         isLoading.value = true;
         try {
             const data = await fetchProductsByRegion(region);
-            products.value = data;
+            
+            // 🚨 REEMPLAZA ESTA LÍNEA: Asegura que cada producto tenga su historial inicial.
+            products.value = data.map(product => ({
+                ...product,
+                // Inicializamos el historial con el precio actual (price)
+                priceHistory: [product.price], 
+            }));
+
         } catch (error) {
             console.error("Error al cargar productos:", error);
         } finally {
@@ -78,6 +85,27 @@ export const useKioscoStore = defineStore('kiosco', () => {
             return false;
         }
     }
+    
+    function applyPriceFluctuation(productId, newPrice) {
+        // 1. Encuentra el producto mutable en el array 'products'
+        const productToUpdate = products.value.find(p => p.id === productId);
+
+        if (productToUpdate) {
+            
+            // 2. Actualiza el precio del producto
+            productToUpdate.price = newPrice;
+            
+            // 3. ¡Guarda el nuevo precio en el historial!
+            productToUpdate.priceHistory.push(newPrice);
+            
+            // Opcional: Limita la longitud del historial para que no crezca demasiado
+            const MAX_HISTORY_SIZE = 15; 
+            if (productToUpdate.priceHistory.length > MAX_HISTORY_SIZE) {
+                // Elimina el elemento más antiguo (el primero)
+                productToUpdate.priceHistory.shift(); 
+            }
+        }
+    }
 
     // --- ¡NUEVA FUNCIÓN (PASO 3A - TU TAREA)! ---
     /**
@@ -120,10 +148,12 @@ export const useKioscoStore = defineStore('kiosco', () => {
         loadProducts,
         buyProduct,
         sellProduct,
+        applyPriceFluctuation, // <--- CAMBIO: Traído de la rama conflictiva
+        // ¡CAMBIO 2: DEVOLVEMOS LOS NUEVOS GETTERS!
         inventoryValue,
         netWorth,
         loadState, // <-- ¡AÑADIDA TU FUNCIÓN!
-        //NUevo
+        //NUEVO
         currentDay,
         marketEvent,
         setMarketEvent,
