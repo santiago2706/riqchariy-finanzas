@@ -14,7 +14,7 @@ export const useKioscoStore = defineStore('kiosco', () => {
     const products = ref([]); // Productos del JSON
     const inventory = ref([]); // Inventario del jugador { product: {}, quantity: 0 }
     const isLoading = ref(false); // Para mostrar un "Cargando..."
-    
+
     //NUEVO: estado para Dev4
     const currentDay =ref(1);
     const marketEvent = ref(null) //{ message, productID?, priceMultiplier? }
@@ -40,18 +40,16 @@ export const useKioscoStore = defineStore('kiosco', () => {
      * Lógica para comprar un producto
      */
     function buyProduct(product, quantity = 1) {
+        // ... (tu lógica de compra existente) ...
         const cost = product.cost * quantity;
-
         if (saldo.value >= cost) {
             saldo.value -= cost;
             const item = inventory.value.find(item => item.product.id === product.id);
-
             if (item) {
                 item.quantity += quantity;
             } else {
                 inventory.value.push({ product, quantity });
             }
-
             console.log(`Comprados ${quantity} de ${product.name}. Saldo: ${saldo.value.toFixed(2)}`);
             return true;
         } else {
@@ -64,17 +62,15 @@ export const useKioscoStore = defineStore('kiosco', () => {
      * Lógica para vender un producto
      */
     function sellProduct(itemToSell, quantity = 1) {
+        // ... (tu lógica de venta existente) ...
         const product = itemToSell.product;
         const revenue = product.price * quantity;
-
         if (itemToSell.quantity >= quantity) {
             saldo.value += revenue;
             itemToSell.quantity -= quantity;
-
             if (itemToSell.quantity <= 0) {
                 inventory.value = inventory.value.filter(item => item.product.id !== product.id);
             }
-
             console.log(`Vendidos ${quantity} de ${product.name}. Ganancia: ${revenue.toFixed(2)}`);
             return true;
         } else {
@@ -83,28 +79,34 @@ export const useKioscoStore = defineStore('kiosco', () => {
         }
     }
 
-    //NUEVO:
+    // --- ¡NUEVA FUNCIÓN (PASO 3A - TU TAREA)! ---
+    /**
+     * (TAREA LÍDER) Sobrescribe el estado inicial con datos guardados.
+     */
+    function loadState(savedInventory, savedSaldo, savedDay) {
+        console.log("[Kiosco Store]: Cargando estado guardado...");
+        inventory.value = savedInventory;
+        saldo.value = savedSaldo;
+        currentDay.value = savedDay; // También cargamos el día
+    }
+    // --- FIN DE LA NUEVA FUNCIÓN ---
+
+    //NUEVO: (Código de Dev 4)
     function setMarketEvent(evt) { marketEvent.value = evt }
-    function clearMarketEvent()   { marketEvent.value = null }
-    function nextDay() { 
+    function clearMarketEvent() { marketEvent.value = null }
+    function nextDay() {
         currentDay.value += 1
-            setMarketEvent({message:`Inicia el Día ${currentDay.value}`})
+        setMarketEvent({message:`Inicia el Día ${currentDay.value}`})
     }
 
     // --- 4. GETTERS (Métricas calculadas, Paso A) ---
-
-    // Calcula el valor actual del inventario (usando el costo de compra)
     const inventoryValue = computed(() => {
-        // total es el acumulador, item es el objeto {product, quantity}
         return inventory.value.reduce((total, item) => {
-            // Sumamos (costo * cantidad) de cada item
             return total + (item.product.cost * item.quantity);
-        }, 0); // El 0 es el valor inicial
+        }, 0);
     });
 
-    // Calcula el valor total del patrimonio del jugador
     const netWorth = computed(() => {
-        // Patrimonio Neto = Saldo en Efectivo + Valor del Inventario
         return saldo.value + inventoryValue.value;
     });
 
@@ -118,9 +120,9 @@ export const useKioscoStore = defineStore('kiosco', () => {
         loadProducts,
         buyProduct,
         sellProduct,
-        // ¡CAMBIO 2: DEVOLVEMOS LOS NUEVOS GETTERS!
         inventoryValue,
         netWorth,
+        loadState, // <-- ¡AÑADIDA TU FUNCIÓN!
         //NUevo
         currentDay,
         marketEvent,
