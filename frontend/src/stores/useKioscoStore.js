@@ -14,6 +14,10 @@ export const useKioscoStore = defineStore('kiosco', () => {
     const products = ref([]); // Productos del JSON
     const inventory = ref([]); // Inventario del jugador { product: {}, quantity: 0 }
     const isLoading = ref(false); // Para mostrar un "Cargando..."
+    
+    //NUEVO: estado para Dev4
+    const currentDay =ref(1);
+    const marketEvent = ref(null) //{ message, productID?, priceMultiplier? }
 
     // --- 3. ACCIONES (Las funciones del juego) ---
 
@@ -79,6 +83,14 @@ export const useKioscoStore = defineStore('kiosco', () => {
         }
     }
 
+    //NUEVO:
+    function setMarketEvent(evt) { marketEvent.value = evt }
+    function clearMarketEvent()   { marketEvent.value = null }
+    function nextDay() { 
+        currentDay.value += 1
+            setMarketEvent({message:`Inicia el Día ${currentDay.value}`})
+    }
+
     // --- 4. GETTERS (Métricas calculadas, Paso A) ---
 
     // Calcula el valor actual del inventario (usando el costo de compra)
@@ -108,6 +120,12 @@ export const useKioscoStore = defineStore('kiosco', () => {
         sellProduct,
         // ¡CAMBIO 2: DEVOLVEMOS LOS NUEVOS GETTERS!
         inventoryValue,
-        netWorth
+        netWorth,
+        //NUevo
+        currentDay,
+        marketEvent,
+        setMarketEvent,
+        clearMarketEvent,
+        nextDay
     };
 });

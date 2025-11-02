@@ -7,20 +7,25 @@
       <strong>⚙️ Verificación del Motor de Mercado:</strong>
       <p>Día actual: {{ market?.day }}</p>
       <button
-        @click="market?.advanceDay()"
-        style="background-color: #007bff; color: white; padding: 5px 10px; border: none; border-radius: 5px; cursor: pointer;">
+        @click="onAdvanceDay"
+        style="background-color:#007bff;color:#fff;padding:5px 10px;border:none;border-radius:5px;cursor:pointer;"
+      >
         Forzar Avance de Día
       </button>
+
+
     </div>
 
     <div style="margin: 20px 0;">
       <button
-        @click="transaction?.endDayAndSave()"
-        :disabled="transaction?.isLoading"
-        style="background-color: #dc3545; color: white; padding: 10px 15px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; width: 100%;"
-      >
-        {{ transaction?.isLoading ? 'Guardando...' : 'Terminar Día y Guardar Progreso' }}
-      </button>
+      @click="onEndDay"
+      :disabled="transaction?.isLoading"
+      style="background-color:#dc3545;color:#fff;padding:10px 15px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:100%;"
+    >
+      {{ transaction?.isLoading ? 'Guardando...' : 'Terminar Día y Guardar Progreso' }}
+    </button>
+
+
     </div>
     <hr>
     <div v-if="kiosco?.isLoading">
@@ -74,4 +79,15 @@ onMounted(() => {
     console.error("KioscoView: No se pudo encontrar la región del usuario.");
   }
 });
+
+function onAdvanceDay(){
+  kiosco.value?.nextDay()            // dispara el pop-up
+  market.value?.advanceDay()         // mantiene tu lógica actual
+}
+
+async function onEndDay(){
+  await transaction.value?.endDayAndSave()
+  kiosco.value?.setMarketEvent({ message:`Día ${kiosco.value?.currentDay} guardado` })
+}
+
 </script>

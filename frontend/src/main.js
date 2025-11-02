@@ -1,7 +1,8 @@
 import './assets/main.css' // (Mantenemos tus estilos)
 
 import { createApp } from 'vue'
-import { createPinia } from 'pinia' // Importamos el creador de Pinia
+import { createPinia, setActivePinia } from 'pinia' // Importamos el creador de Pinia
+import {useKioscoStore} from '@/stores/useKioscoStore'
 
 import App from './App.vue'
 import router from './router' // Importamos nuestro router
@@ -21,3 +22,7 @@ app.use(router)
 // -------------------------
 
 app.mount('#app')
+
+if (import.meta.env.DEV) {                 // <-- nuevo
+    setActivePinia(pinia)
+}
