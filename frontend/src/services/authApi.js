@@ -31,6 +31,12 @@ export const login = async (email, password) => {
 export const register = async (userData) => {
     // Simular delay de red
     await new Promise(resolve => setTimeout(resolve, 500));
+    
+    // Guardar usuario simulado en localStorage para que luego pueda loguearse
+    const users = JSON.parse(localStorage.getItem("fakeUsers") || "[]");
+    users.push(userData);
+    localStorage.setItem("fakeUsers", JSON.stringify(users));
+
 
     return {
         success: true,

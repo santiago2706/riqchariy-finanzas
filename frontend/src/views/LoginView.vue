@@ -2,28 +2,33 @@
 import { ref } from 'vue';
 // 1. Importamos el cerebro de Autenticación
 import { useAuthStore } from '../stores/useAuthStore.js';
+// 2. Importamos el router para redirigir después del login
+import { useRouter, RouterLink } from 'vue-router';
 
 const authStore = useAuthStore();
-// 2. Creamos variables (estado local) para el formulario
+const router = useRouter();
+
+// 3. Creamos variables (estado local) para el formulario
 const email = ref('admin@test.com'); // Pre-llenado para pruebas rápidas
 const password = ref('123456'); // Pre-llenado para pruebas rápidas
 const isLoading = ref(false);
 
-// 3. Esta función se llama al presionar "Ingresar"
+// 4. Esta función se llama al presionar "Ingresar"
 const handleLogin = async () => {
   if (!email.value || !password.value) {
     alert('Por favor, ingresa email y contraseña');
     return;
   }
+
   isLoading.value = true;
 
-  // 4. ¡Llamamos al cerebro para que haga el login!
   try {
     await authStore.login(email.value, password.value);
-    // El router (que configuramos en index.js) nos redirigirá
-    // automáticamente a '/' si el login es exitoso.
+    // Redirigimos manualmente al dashboard si quieres forzar navegación
+    router.push('/dashboard');
   } catch (error) {
     console.error(error);
+    alert('Error al iniciar sesión. Verifica tus credenciales.');
   } finally {
     isLoading.value = false;
   }
@@ -68,6 +73,14 @@ const handleLogin = async () => {
           {{ isLoading ? 'Cargando...' : 'Ingresar' }}
         </button>
       </form>
+
+      <!-- Enlace para registrarse -->
+      <p class="text-sm text-center text-gray-600">
+        ¿No tienes cuenta?
+        <RouterLink to="/register" class="text-blue-600 hover:underline font-medium">
+          Crear cuenta
+        </RouterLink>
+      </p>
     </div>
   </div>
 </template>
