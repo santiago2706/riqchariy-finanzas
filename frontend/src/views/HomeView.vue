@@ -1,7 +1,6 @@
 <script setup>
 // 1. Importamos AMBOS cerebros aquí, arriba del todo
 import { useAuthStore } from '../stores/useAuthStore.js';
-import { useKioscoStore } from '../stores/useKioscoStore.js';
 import KioscoModule from '../components/KioskoModule.vue';
 
 
