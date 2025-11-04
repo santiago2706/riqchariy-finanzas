@@ -1,128 +1,128 @@
-<script setup>
-import { useKioscoStore } from '../stores/useKioscoStore';
-import { onMounted } from 'vue'; // Se ejecuta 1 vez cuando la página carga
-import { useMarketStore } from '../services/useMarketStore'; // 1. AGREGADO: El Economista
-import { useAuthStore } from '../stores/useAuthStore';     // 2. AGREGADO: Para la región
-
-const kiosco = useKioscoStore();
-const auth = useAuthStore();    
-const market = useMarketStore();
-
-// ¡LA CLAVE! Le decimos al store que cargue los productos
-// en cuanto la página esté lista.
-onMounted(() => {
-  // --- ¡AQUÍ ESTÁ EL CAMBIO! ---
-  //Pedimos la region real al usuario. Actualmente el usuario es demo
-  if (auth.user && auth.user.region) {
-    kiosco.loadProducts(auth.user.region)
-  } else {
-    console.error("KioscoView: No se pudo encontrar la región del usuario.");
-  }
-});
-</script>
-
 <template>
-  <div>
-    <h1>¡Este es el Kiosco!</h1>
-    <p>Tu saldo: <strong>${{ kiosco?.saldo?.toFixed(2) }}</strong></p>
-
-    <div style="background-color: #ffc; border: 1px solid #e6db55; padding: 10px; margin-top: 15px; margin-bottom: 15px;">
-      <strong>⚙️ Verificación del Motor de Mercado:</strong>
-      <p>Día actual: {{ market.day }}</p>
-      <button 
-        @click="market.advanceDay()" 
-        class="bg-blue-600 text-white py-1 px-2.5 rounded-md cursor-pointer border-none hover:bg-blue-700">
-        Forzar Avance de Día (Probar Cambio de Precios)
-      </button>
-
-
-    </div>
-
-    <div style="margin: 20px 0;">
+  <div class="max-w-4xl mx-auto p-4 sm:p-6 font-sans">
+    <h1 class="text-3xl font-bold text-gray-800">¡Este es el Kiosco!</h1>
+    <p class="text-lg">Tu saldo: <strong class="text-indigo-600">${{ kiosco?.saldo?.toFixed(2) }}</strong></p>
+    <div class="my-4 p-4 bg-yellow-100 border border-yellow-300 rounded-lg">
+      <strong class="font-bold text-yellow-800">⚙️ Verificación del Motor de Mercado:</strong>
+      <p class="text-sm">Día actual: {{ market?.day }}</p>
       <button
-      @click="onEndDay"
-      :disabled="transaction?.isLoading"
-      style="background-color:#dc3545;color:#fff;padding:10px 15px;border:none;border-radius:5px;cursor:pointer;font-weight:bold;width:100%;"
+        @click="onAdvanceDay"
+        class="mt-2 bg-blue-600 text-white py-1 px-3 rounded-md cursor-pointer hover:bg-blue-700 text-sm font-medium"
+      >
+        Forzar Avance de Día
+      </button>
+    </div>
+    <div class="my-5">
+      <button
+        @click="onEndDay"
+        :disabled="transaction?.isLoading"
+        class="w-full bg-red-600 text-white py-3 px-4 rounded-lg font-bold hover:bg-red-700 disabled:bg-gray-400"
+      >
+        {{ transaction?.isLoading ? 'Guardando...' : 'Terminar Día y Guardar Progreso' }}
+      </button>
+    </div>
+    <div
+      v-if="market && market.marketEvent"
+      class="my-4 p-4 bg-blue-100 text-blue-800 rounded-lg shadow-md"
     >
-      {{ transaction?.isLoading ? 'Guardando...' : 'Terminar Día y Guardar Progreso' }}
-    </button>
-    <div 
-      v-if="market.marketEvents.length > 0" 
-      class="bg-amber-50 border border-amber-200 p-2.5 mt-4 rounded-md"
-    >
-      <h3 class="font-bold text-amber-700">¡Eventos del Mercado!</h3>
-      <ul class="list-disc pl-5">
-        <li v-for="(event, index) in market.marketEvents" :key="index" style="color: #d48806;">
-          {{ event.message }}
-        </li>
-      </ul>
+      <h3 class="font-bold">¡Evento del Mercado!</h3>
+      <p>{{ market.marketEvent.message }}</p>
     </div>
-
-    <hr>
-
-
+    <hr class="my-6 border-gray-300">
+    <div v-if="kiosco?.isLoading" class="text-center p-8">
+      <p class="text-lg font-medium text-gray-600">Cargando productos...</p>
     </div>
-    <hr>
-    <div v-if="kiosco?.isLoading">
-      <p>Cargando productos...</p>
-    </div>
-
     <div v-else-if="market?.products?.length > 0">
-      <h2>Nuestros Productos (Región: {{ auth?.user?.region }}):</h2>
-      <ul>
-        <li v-for="product in market.products" :key="product.id">
-          <span>{{ product.name }} - <strong>${{ product.price?.toFixed(2) }}</strong></span>
-          <button @click="kiosco?.buyProduct(product, 1)">Comprar 1</button>
-        </li>
-      </ul>
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Nuestros Productos (Región: Lima)</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div v-for="product in market.products" :key="product.id" class="bg-gray-50 border border-gray-200 p-4 rounded-xl shadow-md flex flex-col justify-between">
+          <span class="text-lg font-semibold text-gray-700 mb-3">{{ product.name }}</span>
+          <div class="text-sm text-gray-500 mb-4">
+            <small>Costo de Compra:</small>
+            <strong class="text-lg text-red-600 block">${{ product.cost.toFixed(2) }}</strong>
+          </div>
+          <button
+            @click="kiosco?.buyProduct(product, 1)"
+            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded transition duration-200"
+          >
+            Comprar 1
+          </button>
+        </div>
+      </div>
     </div>
-
-    <div v-else>
+    <div v-else class="p-4 bg-red-100 text-red-800 rounded-lg">
       <p>No se encontraron productos para esta región.</p>
     </div>
-
+    <hr class="my-6 border-gray-300">
+    <section class="inventory-section mt-8">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Tu Inventario (Venta)</h2>
+      <div v-if="kiosco?.inventory?.length > 0" class="flex flex-col gap-3">
+        <div v-for="item in kiosco.inventory" :key="item.product.id" class="flex justify-between items-center p-3 bg-yellow-50 border border-yellow-300 rounded-lg shadow-sm">
+          <div class="flex items-center space-x-3">
+            <strong class="text-gray-800 text-lg">{{ item.product.name }}</strong>
+            <span class="bg-yellow-300 text-yellow-900 font-extrabold px-3 py-1 rounded-full text-sm">x{{ item.quantity }}</span>
+          </div>
+          <div class="flex items-center space-x-4">
+            <div class="text-right">
+              <small class="text-gray-500 block leading-tight">Precio de Venta:</small>
+              <strong class="text-green-600 text-xl">${{ item.product.price.toFixed(2) }}</strong>
+            </div>
+            <button
+              @click="kiosco?.sellProduct(item, 1)"
+              class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition duration-200"
+            >
+              Vender 1
+            </button>
+          </div>
+        </div>
+      </div>
+      <div v-else class="p-4 bg-blue-100 text-blue-800 rounded-lg">
+        <p>¡Inventario vacío! Compra algo para empezar a jugar.</p>
+      </div>
+    </section>
   </div>
 </template>
 
 <script setup>
-// ¡EL ARREGLO DEL BUCLE! Importamos 'shallowRef'
 import { onMounted, shallowRef } from 'vue';
 import { useKioscoStore } from '../stores/useKioscoStore';
-import { useMarketStore } from '../services/useMarketStore'; // El de tu compañero
+import { useMarketStore } from '../services/useMarketStore';
 import { useAuthStore } from '../stores/useAuthStore';
-// --- 1. IMPORTA TU NUEVO STORE ---
 import { useTransactionStore } from '../stores/useTransactionStore';
 
-// 2. Define contenedores vacíos.
 const kiosco = shallowRef(null);
 const auth = shallowRef(null);
 const market = shallowRef(null);
-// --- 3. AÑADE EL CONTENEDOR DE TRANSACCIÓN ---
 const transaction = shallowRef(null);
 
-// 4. Llena los contenedores solo cuando el componente esté listo.
-// Esto rompe el bucle de importación circular.
 onMounted(() => {
   kiosco.value = useKioscoStore();
   auth.value = useAuthStore();
   market.value = useMarketStore();
-  transaction.value = useTransactionStore(); // <-- ¡Llena tu store!
+  transaction.value = useTransactionStore();
 
-  if (auth.value.user && auth.value.user.region) {
-    kiosco.value.loadProducts(auth.value.user.region);
-  } else {
-    console.error("KioscoView: No se pudo encontrar la región del usuario.");
+  console.log("Forzando carga de productos para Lima...");
+  kiosco.value.loadProducts('Lima');
+
+  if (market.value && market.value.startGameLoop) {
+    market.value.startGameLoop();
   }
 });
 
 function onAdvanceDay(){
-  kiosco.value?.nextDay()            // dispara el pop-up
-  market.value?.advanceDay()         // mantiene tu lógica actual
+  if (market.value && market.value.advanceDay) {
+    market.value.advanceDay();
+  } else {
+    console.error("Market store no está listo o no tiene advanceDay.");
+  }
 }
 
 async function onEndDay(){
-  await transaction.value?.endDayAndSave()
-  kiosco.value?.setMarketEvent({ message:`Día ${kiosco.value?.currentDay} guardado` })
+  if (transaction.value && transaction.value.endDayAndSave) {
+    await transaction.value.endDayAndSave();
+    console.log(`Día guardado.`);
+  } else {
+    console.error("Transaction store no está listo o no tiene endDayAndSave.");
+  }
 }
-
 </script>

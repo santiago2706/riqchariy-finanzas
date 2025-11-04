@@ -1,41 +1,45 @@
 // Archivo: stores/useKioscoStore.js
 
-import { ref, computed } from 'vue'; // <--- ¡CAMBIO 1: IMPORTAR COMPUTED!
+import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-
-// 1. IMPORTAMOS NUESTRA API FALSA DEL KIOSCO
 import { fetchProductsByRegion } from '../services/kioscoApi.js';
-import { useMarketStore } from '../services/useMarketStore.js';
+// ¡IMPORTAMOS EL MARKET STORE para obtener el precio actual!
+import { useMarketStore } from '../services/useMarketStore';
 
-// 'kiosco' es el ID de este cerebro
 export const useKioscoStore = defineStore('kiosco', () => {
 
     // --- 2. ESTADO (Los datos del juego) ---
-    const saldo = ref(100.00); // Saldo inicial
+    const saldo = ref(100.00);
+    const products = ref([]); // Esta es la lista "maestra" (para gráficos)
     const inventory = ref([]); // Inventario del jugador { product: {}, quantity: 0 }
-    const isLoading = ref(false); // Para mostrar un "Cargando..."
+    const isLoading = ref(false);
 
-    //NUEVO: estado para Dev4
+    //NUEVO: estado para Dev4 (Contador de Días y Eventos)
     const currentDay =ref(1);
-    const marketEvent = ref(null) //{ message, productID?, priceMultiplier? }
+    const marketEvent = ref(null);
 
     // --- 3. ACCIONES (Las funciones del juego) ---
 
-    /**
-     * Carga los productos de la API Falsa
-     */
     async function loadProducts(region) {
-        const marketStore = useMarketStore();
         isLoading.value = true;
+        // ¡PASO 1: Llama al MarketStore (el "Economista")!
+        const marketStore = useMarketStore();
         try {
             const data = await fetchProductsByRegion(region);
-            
-            // 🚨 REEMPLAZA ESTA LÍNEA: Asegura que cada producto tenga su historial inicial.
-            products.value = data.map(product => ({
+
+            // Lógica de Tarea 3 (Gráficos): Inicializa el historial
+            const productsWithHistory = data.map(product => ({
                 ...product,
                 // Inicializamos el historial con el precio actual (price)
-                priceHistory: [product.price], 
+                priceHistory: [product.price],
             }));
+
+            // ¡PASO 2: Dale los productos al MarketStore!
+            // Esto llena la lista 'market.products' que la vista SÍ puede leer.
+            marketStore.setProducts(productsWithHistory);
+
+            // (Guardamos una copia maestra en el KioscoStore también, para los gráficos)
+            products.value = productsWithHistory;
 
         } catch (error) {
             console.error("Error al cargar productos:", error);
@@ -45,81 +49,123 @@ export const useKioscoStore = defineStore('kiosco', () => {
     }
 
     /**
-     * Lógica para comprar un producto
+     * Lógica para comprar un producto (¡CORREGIDO!)
      */
     function buyProduct(product, quantity = 1) {
-        // ... (tu lógica de compra existente) ...
-        const cost = product.cost * quantity;
-        if (saldo.value >= cost) {
-            saldo.value -= cost;
-            const item = inventory.value.find(item => item.product.id === product.id);
-            if (item) {
-                item.quantity += quantity;
-            } else {
-                inventory.value.push({ product, quantity });
-            }
-            console.log(`Comprados ${quantity} de ${product.name}. Saldo: ${saldo.value.toFixed(2)}`);
-            return true;
-        } else {
-          alert("¡Saldo insuficiente!");
-        }
+        // 1. OBTENER EL PRECIO ACTUAL DEL MERCADO
+        const marketStore = useMarketStore();
+        const currentMarketProduct = marketStore.products.find(p => p.id === product.id);
+
+        if (!currentMarketProduct) {
+            console.error("Error: Producto no encontrado en el mercado.");
+            return false;
         }
 
+        // 2. Usa el COSTO de COMPRA del mercado
+        const cost = currentMarketProduct.cost * quantity;
+
+        if (saldo.value >= cost) {
+            saldo.value -= cost;
+
+            // 3. LÓGICA DE INVENTARIO (La que se había perdido)
+            const item = inventory.value.find(item => item.product.id === product.id);
+
+            if (item) {
+                // Si ya lo tiene, solo añade cantidad
+                item.quantity += quantity;
+            } else {
+                // Si es nuevo, añade una COPIA del producto al inventario
+                // Es crucial guardar 'currentMarketProduct' para que el costo sea el de compra.
+                inventory.value.push({ product: { ...currentMarketProduct }, quantity });
+            }
+
+            console.log(`Comprados ${quantity} de ${product.name} por S/${cost.toFixed(2)}`);
+            return true;
+        } else {
+            alert("¡Saldo insuficiente!");
+            return false;
+        }
+    }
+
     /**
-     * Lógica para vender un producto
+     * Lógica para vender un producto (¡FUSIONADA!)
      */
     function sellProduct(itemToSell, quantity = 1) {
-        // ... (tu lógica de venta existente) ...
-        const product = itemToSell.product;
-        const revenue = product.price * quantity;
+        // 'itemToSell' es el objeto de *nuestro inventario*
+        const productInInventory = itemToSell.product;
+
+        // 1. OBTENER EL PRECIO DE VENTA ACTUAL
+        const marketStore = useMarketStore();
+        const currentMarketProduct = marketStore.products.find(p => p.id === productInInventory.id);
+
+        if (!currentMarketProduct) {
+             alert("¡Este producto ya no existe en el mercado!");
+             return false;
+        }
+
+        // 2. ¡Usamos el precio de VENTA (price) del mercado actual!
+        const revenue = currentMarketProduct.price * quantity;
+
         if (itemToSell.quantity >= quantity) {
             saldo.value += revenue;
             itemToSell.quantity -= quantity;
+
             if (itemToSell.quantity <= 0) {
-                inventory.value = inventory.value.filter(item => item.product.id !== product.id);
+                inventory.value = inventory.value.filter(item => item.product.id !== productInInventory.id);
             }
-            console.log(`Vendidos ${quantity} de ${product.name}. Ganancia: ${revenue.toFixed(2)}`);
+
+            console.log(`Vendidos ${quantity} de ${productInInventory.name}. Ganancia: ${revenue.toFixed(2)}`);
             return true;
         } else {
             alert("No tienes suficiente inventario para vender esa cantidad.");
             return false;
         }
     }
-    
+
+    // --- (TU TAREA 2) ---
+    /**
+     * (TAREA 2) Recibe los productos actualizados del MarketStore
+     * y los guarda en el KioscoStore (para los gráficos).
+     */
+    function updateProductsFromMarket(marketProducts) {
+        console.log("[Kiosco Store]: Sincronizando precios con el mercado...");
+        products.value = marketProducts;
+    }
+
+    // --- LÓGICA DE DIFICULTAD CRECIENTE ---
+    // (Esta la llama el MarketStore para registrar cambios)
     function applyPriceFluctuation(productId, newPrice) {
-        // 1. Encuentra el producto mutable en el array 'products'
+        // 1. Encuentra el producto mutable en el array 'products' (la lista maestra)
         const productToUpdate = products.value.find(p => p.id === productId);
 
         if (productToUpdate) {
-            
-            // 2. Actualiza el precio del producto
             productToUpdate.price = newPrice;
-            
-            // 3. ¡Guarda el nuevo precio en el historial!
-            productToUpdate.priceHistory.push(newPrice);
-            
-            // Opcional: Limita la longitud del historial para que no crezca demasiado
-            const MAX_HISTORY_SIZE = 15; 
+
+            // 2. ¡Guarda el nuevo precio en el historial! (Tarea Dev 3)
+            // Verificamos que 'priceHistory' exista antes de 'push'
+            if (productToUpdate.priceHistory) {
+                productToUpdate.priceHistory.push(newPrice);
+            } else {
+                // Si no existe, lo creamos
+                productToUpdate.priceHistory = [newPrice];
+            }
+
+            const MAX_HISTORY_SIZE = 15;
             if (productToUpdate.priceHistory.length > MAX_HISTORY_SIZE) {
-                // Elimina el elemento más antiguo (el primero)
-                productToUpdate.priceHistory.shift(); 
+                productToUpdate.priceHistory.shift();
             }
         }
     }
 
-    // --- ¡NUEVA FUNCIÓN (PASO 3A - TU TAREA)! ---
-    /**
-     * (TAREA LÍDER) Sobrescribe el estado inicial con datos guardados.
-     */
+    // --- (Tu Tarea 1) ---
     function loadState(savedInventory, savedSaldo, savedDay) {
         console.log("[Kiosco Store]: Cargando estado guardado...");
         inventory.value = savedInventory;
         saldo.value = savedSaldo;
         currentDay.value = savedDay; // También cargamos el día
     }
-    // --- FIN DE LA NUEVA FUNCIÓN ---
 
-    //NUEVO: (Código de Dev 4)
+    //--- (Código de Dev 4) ---
     function setMarketEvent(evt) { marketEvent.value = evt }
     function clearMarketEvent() { marketEvent.value = null }
     function nextDay() {
@@ -127,10 +173,15 @@ export const useKioscoStore = defineStore('kiosco', () => {
         setMarketEvent({message:`Inicia el Día ${currentDay.value}`})
     }
 
-    // --- 4. GETTERS (Métricas calculadas, Paso A) ---
+    // --- 4. GETTERS ---
     const inventoryValue = computed(() => {
+        // El valor del inventario se basa en el COSTO al que se COMPRÓ
         return inventory.value.reduce((total, item) => {
-            return total + (item.product.cost * item.quantity);
+            // Añadimos una comprobación por si 'item.product' es indefinido
+            if (item && item.product && typeof item.product.cost === 'number' && typeof item.quantity === 'number') {
+                return total + (item.product.cost * item.quantity);
+            }
+            return total;
         }, 0);
     });
 
@@ -139,20 +190,21 @@ export const useKioscoStore = defineStore('kiosco', () => {
     });
 
 
-    // --- 5. Devolvemos todo para que los componentes lo usen ---
+    // --- 5. Devolvemos todo (¡VERSION FUSIONADA Y LIMPIA!) ---
     return {
         saldo,
+        products, // La lista maestra (para gráficos)
         inventory,
         isLoading,
         loadProducts,
         buyProduct,
         sellProduct,
-        applyPriceFluctuation, // <--- CAMBIO: Traído de la rama conflictiva
-        // ¡CAMBIO 2: DEVOLVEMOS LOS NUEVOS GETTERS!
+        updateProductsFromMarket, // <-- ¡Añadido: Tu Tarea 2!
+        applyPriceFluctuation, // (Viene de Tarea 3)
         inventoryValue,
         netWorth,
-        loadState, // <-- ¡AÑADIDA TU FUNCIÓN!
-        //NUEVO
+        loadState, // (Viene de Tarea 1)
+        //(Viene de Tarea 4)
         currentDay,
         marketEvent,
         setMarketEvent,
