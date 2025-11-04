@@ -1,69 +1,66 @@
 <script setup>
-// 1. Importamos AMBOS cerebros aquí, arriba del todo
-import { useAuthStore } from '../stores/useAuthStore.js';
-import KioscoModule from '../components/KioskoModule.vue';
-
-
-// 2. El HomeView (padre) SOLO necesita el authStore
-const authStore = useAuthStore();
-
-// 3. DEFINIMOS KioscoModule AQUÍ MISMO (temporalmente)
-
-// 4. DEFINIMOS ProyectoModule AQUÍ MISMO (temporalmente)
-const ProyectoModule = {
-  template: `
-    <div class="p-6 bg-white rounded-lg shadow-lg">
-      <h3 class="text-2xl font-bold text-yellow-600">Módulo: Mi Gran Evento</h3>
-      <p class="mb-4">¡Hora de planificar tu presupuesto!</p>
-      <p class="text-gray-600">(Aquí iría el simulador de presupuesto que definimos...)</p>
-    </div>
-  `
-};
-
+// Importamos RouterLink para usarlo en los botones de "Registrarme"
+import { RouterLink } from 'vue-router'
 </script>
 
-
-
 <template>
-  <div v-if="authStore.user" class="min-h-screen bg-gray-100">
-    <nav class="bg-white shadow-md">
-      <div class="container px-6 py-4 mx-auto">
-        <div class="flex items-center justify-between">
-          <div class="text-2xl font-bold text-blue-600">Riqch'ariy Finanzas</div>
-          <div class="flex items-center">
-            <span class="mr-4 text-gray-700">Hola, {{ authStore.user.name }}</span>
-            <button
-              @click="authStore.logout()"
-              class="px-4 py-2 font-medium text-white bg-red-500 rounded-md hover:bg-red-600"
-            >
-              Salir
-            </button>
-          </div>
+  <!-- Contenedor principal de la página -->
+  <div class="bg-white">
+
+    <!-- Sección 1: "Hero" (El encabezado principal de tu diseño) -->
+    <section class="bg-gradient-to-r from-green-300 via-cyan-400 to-blue-500 text-white text-center py-20 px-4">
+
+      <!-- Título y Subtítulo -->
+      <h1 class="text-5xl md:text-6xl font-bold mb-6 drop-shadow-lg">
+        Educación Financiera que Crece con tus Hijos
+      </h1>
+      <p class="text-xl md:text-2xl mb-10 max-w-3xl mx-auto drop-shadow-md">
+        El primer ecosistema adaptativo del Perú que transforma la educación financiera en una
+        aventura familiar desde los 6 hasta los 17 años.
+      </p>
+
+      <!-- Botón especial "Gratuito" -->
+      <div class="inline-block bg-gradient-to-r from-orange-400 to-yellow-400 text-white font-bold py-3 px-6 rounded-full shadow-lg mb-12">
+        ✨ Totalmente Gratuito - Sin Costo Alguno ✨
+      </div>
+
+      <!-- Tarjetas de "Prueba Social" (los óvalos) -->
+      <div class="flex flex-wrap justify-center gap-6 mb-12">
+        <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-full px-6 py-3 text-lg font-medium shadow">
+          🌟 11 años de aprendizaje continuo
+        </div>
+        <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-full px-6 py-3 text-lg font-medium shadow">
+          🚀 9 niveles progresivos
+        </div>
+        <div class="bg-white bg-opacity-30 backdrop-blur-sm rounded-full px-6 py-3 text-lg font-medium shadow">
+          🤖 IA personalizada
         </div>
       </div>
-    </nav>
 
-    <main class="container p-6 mx-auto">
-      <h1 class="mb-6 text-4xl font-bold">Tu Panel Principal</h1>
-
-      <div v-if="authStore.user.level === 'semilla'" class="space-y-4">
-        <h2 class="text-3xl font-semibold text-gray-800">🌱 Nivel Semilla</h2>
-        <KioscoModule />
+      <!-- Botones de Acción (¡Usando Rutas Nombradas!) -->
+      <div class="flex justify-center gap-6">
+        <!-- El botón "Registrarme" ahora usa la ruta nombrada 'register' -->
+        <router-link :to="{ name: 'register' }">
+          <button class="bg-gradient-to-r from-yellow-400 to-orange-500 text-white font-bold text-xl py-4 px-10 rounded-full shadow-lg hover:scale-105 transition-transform">
+            Registrarme Ahora
+          </button>
+        </router-link>
+        <button class="bg-gradient-to-r from-green-400 to-cyan-500 text-white font-bold text-xl py-4 px-10 rounded-full shadow-lg hover:scale-105 transition-transform">
+          Conocer Más
+        </button>
       </div>
+    </section>
 
-      <div v-else-if="authStore.user.level === 'brote'" class="space-y-4">
-        <h2 class="text-3xl font-semibold text-gray-800">🌿 Nivel Brote</h2>
-        <ProyectoModule />
-      </div>
+    <!-- Sección 2: "¿Por qué Riqch'ariy es diferente?" -->
+    <section class="py-20 px-4 text-center">
+      <h2 class="text-4xl font-bold text-gray-800 mb-6">
+        ¿Por qué Riqch'ariy es diferente?
+      </h2>
+      <p class="text-xl text-gray-600 max-w-3xl mx-auto">
+        Un ecosistema completo diseñado para evolucionar con cada etapa del desarrollo de tus hijos
+      </p>
+      <!-- Aquí puedes añadir más contenido, como tarjetas de características -->
+    </section>
 
-      <div v-else-if="authStore.user.level === 'arbol'" class="space-y-4">
-        <h2 class="text-3xl font-semibold text-gray-800">🌳 Nivel Árbol</h2>
-        <p>Próximamente: ¡Módulos de Inversión!</p>
-      </div>
-
-    </main>
-  </div>
-  <div v-else class="flex items-center justify-center min-h-screen">
-    <p class="text-2xl">Cargando datos del usuario...</p>
   </div>
 </template>

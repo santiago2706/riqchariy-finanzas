@@ -1,5 +1,3 @@
-// Archivo: stores/useKioscoStore.js
-
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { fetchProductsByRegion } from '../services/kioscoApi.js';
@@ -14,9 +12,12 @@ export const useKioscoStore = defineStore('kiosco', () => {
     const inventory = ref([]); // Inventario del jugador { product: {}, quantity: 0 }
     const isLoading = ref(false);
 
-    //NUEVO: estado para Dev4 (Contador de Días y Eventos)
-    const currentDay =ref(1);
+    // NUEVO: estado para Dev4 (Contador de Días y Eventos)
+    const currentDay = ref(1);
     const marketEvent = ref(null);
+
+    // ✅ CAMBIO 1: AÑADIDA LA REGIÓN ACTUAL (para el Dashboard)
+    const currentRegion = ref('Lima');
 
     // --- 3. ACCIONES (Las funciones del juego) ---
 
@@ -35,11 +36,13 @@ export const useKioscoStore = defineStore('kiosco', () => {
             }));
 
             // ¡PASO 2: Dale los productos al MarketStore!
-            // Esto llena la lista 'market.products' que la vista SÍ puede leer.
             marketStore.setProducts(productsWithHistory);
 
             // (Guardamos una copia maestra en el KioscoStore también, para los gráficos)
             products.value = productsWithHistory;
+
+            // Al cargar exitosamente, actualizamos la región
+            currentRegion.value = region; // <--- Opcional: actualiza la región al cargar
 
         } catch (error) {
             console.error("Error al cargar productos:", error);
@@ -75,7 +78,6 @@ export const useKioscoStore = defineStore('kiosco', () => {
                 item.quantity += quantity;
             } else {
                 // Si es nuevo, añade una COPIA del producto al inventario
-                // Es crucial guardar 'currentMarketProduct' para que el costo sea el de compra.
                 inventory.value.push({ product: { ...currentMarketProduct }, quantity });
             }
 
@@ -99,8 +101,8 @@ export const useKioscoStore = defineStore('kiosco', () => {
         const currentMarketProduct = marketStore.products.find(p => p.id === productInInventory.id);
 
         if (!currentMarketProduct) {
-             alert("¡Este producto ya no existe en el mercado!");
-             return false;
+              alert("¡Este producto ya no existe en el mercado!");
+              return false;
         }
 
         // 2. ¡Usamos el precio de VENTA (price) del mercado actual!
@@ -122,7 +124,6 @@ export const useKioscoStore = defineStore('kiosco', () => {
         }
     }
 
-    // --- (TU TAREA 2) ---
     /**
      * (TAREA 2) Recibe los productos actualizados del MarketStore
      * y los guarda en el KioscoStore (para los gráficos).
@@ -133,7 +134,6 @@ export const useKioscoStore = defineStore('kiosco', () => {
     }
 
     // --- LÓGICA DE DIFICULTAD CRECIENTE ---
-    // (Esta la llama el MarketStore para registrar cambios)
     function applyPriceFluctuation(productId, newPrice) {
         // 1. Encuentra el producto mutable en el array 'products' (la lista maestra)
         const productToUpdate = products.value.find(p => p.id === productId);
@@ -142,11 +142,9 @@ export const useKioscoStore = defineStore('kiosco', () => {
             productToUpdate.price = newPrice;
 
             // 2. ¡Guarda el nuevo precio en el historial! (Tarea Dev 3)
-            // Verificamos que 'priceHistory' exista antes de 'push'
             if (productToUpdate.priceHistory) {
                 productToUpdate.priceHistory.push(newPrice);
             } else {
-                // Si no existe, lo creamos
                 productToUpdate.priceHistory = [newPrice];
             }
 
@@ -158,11 +156,12 @@ export const useKioscoStore = defineStore('kiosco', () => {
     }
 
     // --- (Tu Tarea 1) ---
-    function loadState(savedInventory, savedSaldo, savedDay) {
+    function loadState(savedInventory, savedSaldo, savedDay, savedRegion) {
         console.log("[Kiosco Store]: Cargando estado guardado...");
         inventory.value = savedInventory;
         saldo.value = savedSaldo;
-        currentDay.value = savedDay; // También cargamos el día
+        currentDay.value = savedDay;
+        currentRegion.value = savedRegion; // <--- Opcional: carga la región
     }
 
     //--- (Código de Dev 4) ---
@@ -175,14 +174,13 @@ export const useKioscoStore = defineStore('kiosco', () => {
 
     // --- 4. GETTERS ---
     const inventoryValue = computed(() => {
-        // El valor del inventario se basa en el COSTO al que se COMPRÓ
+        // ... (Tu lógica de inventoryValue)
         return inventory.value.reduce((total, item) => {
-            // Añadimos una comprobación por si 'item.product' es indefinido
-            if (item && item.product && typeof item.product.cost === 'number' && typeof item.quantity === 'number') {
-                return total + (item.product.cost * item.quantity);
-            }
-            return total;
-        }, 0);
+             if (item && item.product && typeof item.product.cost === 'number' && typeof item.quantity === 'number') {
+                 return total + (item.product.cost * item.quantity);
+             }
+             return total;
+         }, 0);
     });
 
     const netWorth = computed(() => {
@@ -193,20 +191,21 @@ export const useKioscoStore = defineStore('kiosco', () => {
     // --- 5. Devolvemos todo (¡VERSION FUSIONADA Y LIMPIA!) ---
     return {
         saldo,
-        products, // La lista maestra (para gráficos)
+        products,
         inventory,
         isLoading,
+        // ✅ CAMBIO 2: EXPUESTA LA REGIÓN ACTUAL
+        currentRegion,
+        currentDay,
+        marketEvent,
+        inventoryValue,
+        netWorth,
         loadProducts,
         buyProduct,
         sellProduct,
-        updateProductsFromMarket, // <-- ¡Añadido: Tu Tarea 2!
-        applyPriceFluctuation, // (Viene de Tarea 3)
-        inventoryValue,
-        netWorth,
-        loadState, // (Viene de Tarea 1)
-        //(Viene de Tarea 4)
-        currentDay,
-        marketEvent,
+        updateProductsFromMarket,
+        applyPriceFluctuation,
+        loadState,
         setMarketEvent,
         clearMarketEvent,
         nextDay
