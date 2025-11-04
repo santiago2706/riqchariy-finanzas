@@ -69,6 +69,13 @@ export const useMarketStore = defineStore('market', {
         loadState(savedDay) {
           console.log("[Market Store]: Cargando día guardado...");
           this.day = savedDay;
+        },
+
+        /**
+         * (TAREA 4) Limpia el evento actual para que el pop-up desaparezca.
+         */
+        clearMarketEvent() {
+            this.marketEvent = null;
         }
     },
 

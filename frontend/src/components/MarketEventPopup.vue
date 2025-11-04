@@ -1,25 +1,32 @@
 <script setup>
 import {computed, watch} from 'vue'
 import {storeToRefs} from 'pinia'
-import {useKioscoStore} from '@/stores/useKioscoStore'
+// ✅ USAR TU STORE PRINCIPAL DE MERCADO
+import {useMarketStore} from '../services/useMarketStore'
 
-const s = useKioscoStore()
+// 1. Inicializa el Store y extrae la propiedad reactiva marketEvent
+const s = useMarketStore()
 const {marketEvent} = storeToRefs(s)
 
+// 2. Propiedades computadas para la plantilla
 const show = computed(() => !!marketEvent.value)
 const message = computed(() => marketEvent.value?.message ?? 'Evento del mercado')
 
+// 3. Función para cerrar el popup y limpiar el evento en Pinia
 function close() {
-  s.clearMarketEvent?.()
-  marketEvent.value = null
+    // Llama a la acción que acabamos de añadir en el Store
+    s.clearMarketEvent?.()
 }
 
+// 4. Lógica del Watcher con control de tiempo
 let t
 watch(marketEvent, (v) => {
-  if(v) {
-    clearTimeout(t)
-    t = setTimeout(close, 4000)
-  }
+    if(v) {
+        // Limpia el timeout anterior si el usuario hace clic rápidamente
+        clearTimeout(t)
+        // 4 segundos en pantalla (puedes ajustar a 5000ms si lo prefieres)
+        t = setTimeout(close, 4000)
+    }
 })
 </script>
 
@@ -45,6 +52,7 @@ watch(marketEvent, (v) => {
 </template>
 
 <style scoped>
+/* Usar las clases de transición del segundo código (más limpias) */
 .fade-enter-active,
 .fade-leave-active {
   transition: all 0.3s ease;
@@ -52,6 +60,6 @@ watch(marketEvent, (v) => {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
-  transform: translate(-50%, -20px);
+  transform: translate(-50%, -20px); /* Sube ligeramente al desaparecer */
 }
 </style>
