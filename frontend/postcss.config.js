@@ -1,6 +1,10 @@
+// Usamos 'export default' (ESM) para que coincida con vite.config.js
 export default {
   plugins: {
-    '@tailwindcss/postcss': {}, // <-- Esta es la nueva forma de llamarlo
-    'autoprefixer': {},
+    // 1. Usamos el plugin que el error te pidió instalar
+    '@tailwindcss/postcss': {},
+
+    // 2. Autoprefixer (buena práctica para compatibilidad con navegadores)
+    autoprefixer: {},
   },
 }

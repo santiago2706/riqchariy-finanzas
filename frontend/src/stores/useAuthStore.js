@@ -1,90 +1,157 @@
-import {ref} from 'vue';
-import {defineStore} from 'pinia';
-import {login as apiLogin, register as apiRegister} from '../services/authApi.js';
+import { ref } from 'vue';
+import { defineStore } from 'pinia';
+import { login as apiLogin, register as apiRegister } from '../services/authApi.js';
 import router from '../router/index.js';
-import {useKioscoStore} from './useKioscoStore';
-import {useMarketStore} from './useMarketStore';
-import {fetchGameState} from '../services/transactionApi.js';
+import { useKioscoStore } from './useKioscoStore';
+import { useMarketStore } from './useMarketStore';
+import { fetchGameState } from '../services/transactionApi.js';
 
 export const useAuthStore = defineStore('auth', () => {
-const getSavedUser = () => {
-try {
-const savedUser = localStorage.getItem('user');
-return savedUser ? JSON.parse(savedUser) : null;
-} catch (error) {
-console.error('Error al parsear el usuario del localStorage:', error);
-localStorage.removeItem('user');
-return null;
-}
-};
+    // 1. ESTADO
+    // Inicializamos como null. La carga desde localStorage se hará explícitamente con initialize().
+    const user = ref(null);
+    const token = ref(null);
 
-const user = ref(getSavedUser());
-const token = ref(localStorage.getItem('token'));
+    // --- LÓGICA DE CARGA DIFERIDA ---
+    /**
+     * Carga el estado de autenticación (user y token) desde el localStorage.
+     * Esta función debe ser llamada en el setup inicial de App.vue.
+     */
+    function initialize() {
+        try {
+            const savedUser = localStorage.getItem('user');
+            const savedToken = localStorage.getItem('token');
 
-async function login(email, password) {
-try {
-const response = await apiLogin(email, password);
-if (response.success) {
-user.value = response.user;
-token.value = response.token;
-localStorage.setItem('user', JSON.stringify(response.user));
-localStorage.setItem('token', response.token);
+            user.value = savedUser ? JSON.parse(savedUser) : null;
+            token.value = savedToken || null;
 
-try {
-console.log('[Auth Store]: Login exitoso. Cargando datos del juego...');
-const savedState = await fetchGameState();
-const kioscoStore = useKioscoStore();
-const marketStore = useMarketStore();
-kioscoStore.loadState(savedState.inventario, savedState.saldo, savedState.day);
-marketStore.loadState(savedState.day);
-} catch (loadError) {
-console.error('Error al cargar el estado del juego:', loadError);
-}
+            if (savedUser && !savedToken) {
+                // Limpieza si solo hay usuario pero no token (estado inconsistente)
+                localStorage.removeItem('user');
+                user.value = null;
+            }
+        } catch (e) {
+            console.error('Error al inicializar AuthStore:', e);
+            localStorage.removeItem('user');
+            localStorage.removeItem('token');
+            user.value = null;
+            token.value = null;
+        }
+    }
 
-router.push({name: 'dashboard'});
-return true;
-} else {
-console.log(response.message);
-return false;
-}
-} catch (error) {
-console.error('Error en login:', error);
-console.log('Hubo un error al iniciar sesión.');
-return false;
-}
-}
+    // 2. ACCIONES
 
-async function register(userData) {
-try {
-const response = await apiRegister(userData);
-if (response.success) {
-console.log('Usuario registrado correctamente. Ahora puedes iniciar sesión.');
-router.push({name: 'login'});
-return true;
-} else {
-console.log(response.message || 'Error al registrar el usuario.');
-return false;
-}
-} catch (error) {
-console.error('Error en register:', error);
-console.log('Hubo un problema al registrar la cuenta.');
-return false;
-}
-}
+    /**
+     * 🔐 LOGIN: Maneja la carga de estado y la redirección por ROL.
+     */
+    async function login(email, password) {
+        try {
+            const response = await apiLogin(email, password);
 
-function logout() {
-user.value = null;
-token.value = null;
-localStorage.removeItem('user');
-localStorage.removeItem('token');
-router.push({name: 'login'});
-}
+            if (response.success) {
+                user.value = response.user;
+                token.value = response.token;
+                localStorage.setItem('user', JSON.stringify(response.user));
+                localStorage.setItem('token', response.token);
 
-return {
-user,
-token,
-login,
-register,
-logout
-};
+                // --- Lógica de Carga de Juego (Aislada con try...catch) ---
+                if (user.value.role === 'Estudiante') {
+                    try {
+                        console.log('[Auth Store]: Login exitoso. Intentando cargar datos del juego...');
+                        const savedState = await fetchGameState();
+                        const kioscoStore = useKioscoStore();
+                        const marketStore = useMarketStore();
+
+                        // Carga estado de juego (saldo, inventario, día, región)
+                        kioscoStore.loadState(savedState.inventario, savedState.saldo, savedState.day, user.value.region);
+                        marketStore.loadState(savedState.day);
+
+                    } catch (loadError) {
+                        // ⚠️ ARREGLO CLAVE: Si la carga falla, SOLO mostramos el error, pero NO rompemos
+                        // la función 'login' ni forzamos logout.
+                        console.error('⚠️ Advertencia: Error al cargar el estado del juego (Simulación rota):', loadError);
+                    }
+                }
+
+                // --- Lógica de Redirección por ROL y Nivel ---
+                if (user.value.role === 'Estudiante') {
+                    if (!user.value.level) {
+                        // Estudiante sin nivel -> Diagnóstico
+                        router.push({ name: 'diagnostico' });
+                    } else {
+                        // Estudiante con nivel -> Dashboard de juego
+                        router.push({ name: 'dashboard' });
+                    }
+                } else if (user.value.role === 'Profesor' || user.value.role === 'Colegio') {
+                    // Gestión (Profesor/Colegio) -> Dashboard de gestión
+                    router.push({ name: 'profesor-dashboard' });
+                } else {
+                    router.push({ name: 'dashboard' }); // Default (por si acaso)
+                }
+
+                return true;
+            } else {
+                console.error(response.message);
+                return false;
+            }
+        } catch (error) {
+            console.error('Error en login (API):', error);
+            return false;
+        }
+    }
+
+    /**
+     * 🧾 REGISTER: Guarda la información completa del perfil.
+     */
+    async function register(userData) {
+        try {
+            const response = await apiRegister(userData);
+
+            if (response.success) {
+                console.log('Usuario registrado correctamente. Ahora puedes iniciar sesión.');
+                // Redirigimos al Login
+                router.push({ name: 'login' });
+                return true;
+            } else {
+                console.error(response.message || 'Error al registrar el usuario.');
+                return false;
+            }
+        } catch (error) {
+            console.error('Error en register:', error);
+            return false;
+        }
+    }
+
+    /**
+     * 🚪 LOGOUT
+     */
+    function logout() {
+        user.value = null;
+        token.value = null;
+        localStorage.removeItem('user');
+        localStorage.removeItem('token');
+        router.push({ name: 'login' });
+    }
+
+    /**
+     * 🧑‍🎓 ASIGNAR NIVEL: Guarda el nivel asignado después del diagnóstico
+     */
+    function assignLevel(level) {
+        if (user.value) {
+            user.value.level = level;
+            // Actualizar localStorage inmediatamente
+            localStorage.setItem('user', JSON.stringify(user.value));
+        }
+    }
+
+    // --- DEVUELVE LAS ACCIONES Y ESTADO ---
+    return {
+        user,
+        token,
+        login,
+        register,
+        logout,
+        assignLevel,
+        initialize // 👈 EXPORTAMOS LA FUNCIÓN DE INICIALIZACIÓN
+    };
 });

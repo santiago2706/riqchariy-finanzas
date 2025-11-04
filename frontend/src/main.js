@@ -1,28 +1,23 @@
-import './assets/main.css' // (Mantenemos tus estilos)
+import './assets/main.css' // 1. Carga el diccionario de estilos
 
 import { createApp } from 'vue'
-import { createPinia, setActivePinia } from 'pinia' // Importamos el creador de Pinia
-import {useKioscoStore} from '@/stores/useKioscoStore'
-
+import { createPinia, setActivePinia } from 'pinia' // Importamos createPinia y setActivePinia
 import App from './App.vue'
-import router from './router' // Importamos nuestro router
+import router from './router'
 
+// 1. Crear la instancia de Vue
 const app = createApp(App)
 
-// --- ESTE ES EL ARREGLO ---
-// 1. CREAMOS Y CONECTAMOS PINIA (Los Cerebros)
+// 2. Crear la instancia de Pinia (los cerebros)
 const pinia = createPinia()
 app.use(pinia)
 
+// 3. Forzar la activación de Pinia
+// Esto es CRUCIAL para que los guards del router puedan llamar a useAuthStore() inmediatamente.
+setActivePinia(pinia)
 
-// 2. AHORA SÍ CONECTAMOS EL ROUTER (El Guardia)
-// Ahora, cuando el router intente usar el 'useAuthStore',
-// ¡Pinia ya estará encendido y listo!
+// 4. Conectar el Router (el guardia)
 app.use(router)
-// -------------------------
 
+// 5. Montar la aplicación
 app.mount('#app')
-
-if (import.meta.env.DEV) {                 // <-- nuevo
-    setActivePinia(pinia)
-}

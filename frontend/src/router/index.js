@@ -1,7 +1,6 @@
-// src/router/index.js
 import { createRouter, createWebHistory } from 'vue-router';
 
-// 1. IMPORTA TUS NUEVOS LAYOUTS
+// 1. IMPORTA LAYOUTS
 import GameLayout from '@/layouts/GameLayout.vue'
 import PublicLayout from '@/layouts/PublicLayout.vue'
 
@@ -10,90 +9,138 @@ import HomeView from '../views/HomeView.vue';
 import LoginView from '../views/LoginView.vue';
 import RegisterView from '../views/RegisterView.vue';
 import DashboardView from '../views/DashboardView.vue';
-import KioscoView from '../views/KioscoView.vue'; // <-- ¡AÑADIMOS KIOSCO!
+import KioscoView from '../views/KioscoView.vue';
+import DiagnosticoView from '../views/DiagnosticoView.vue';
+// --- Vistas Específicas del Juego ---
+import SemillaView from '../views/SemillaView.vue';
+import PresupuestoView from '../views/PresupuestoView.vue';
+import LeccionesView from '../views/LeccionesView.vue';
+// --- Vistas de Gestión ---
+import AvanceAlumnoView from '../views/AvanceAlumnoView.vue';
 
 // 3. IMPORTA TU AUTH STORE
 import { useAuthStore } from '../stores/useAuthStore.js';
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+    history: createWebHistory(import.meta.env.BASE_URL),
 
-  // 4. ESTA ES LA ESTRUCTURA DE RUTAS *COMBINADA*
-  routes: [
+    // 4. ESTRUCTURA DE RUTAS COMBINADA
+    routes: [
+        // --- Rutas Públicas (usan PublicLayout) ---
+        {
+            path: '/',
+            component: PublicLayout,
+            children: [
+                {
+                    path: '',
+                    name: 'home',
+                    component: HomeView
+                },
+                {
+                    path: 'login',
+                    name: 'login',
+                    component: LoginView,
+                    meta: { requiresGuest: true }
+                },
+                {
+                    path: 'register',
+                    name: 'register',
+                    component: RegisterView,
+                    meta: { requiresGuest: true }
+                },
+                // --- RUTA DE DIAGNÓSTICO ---
+                {
+                    path: 'diagnostico',
+                    name: 'diagnostico',
+                    component: DiagnosticoView,
+                    meta: { requiresAuth: true }
+                }
+            ]
+        },
 
-    // --- Rutas Públicas (usan PublicLayout) ---
-    {
-      path: '/',
-      component: PublicLayout, // <-- "Envuelve" con el Layout Público
-      children: [
-        // La ruta '/' es la LANDING PAGE. Es para todos.
+        // --- Rutas del Juego (usan GameLayout) ---
         {
-          path: '', // Vacío para que coincida con '/'
-          name: 'home',
-          component: HomeView
-          // Sin meta. Es pública.
-        },
-        // La ruta '/login'
-        {
-          path: 'login',
-          name: 'login',
-          component: LoginView,
-          meta: { requiresGuest: true } // Correcto
-        },
-        // La ruta '/register'
-        {
-          path: 'register',
-          name: 'register',
-          component: RegisterView,
-          meta: { requiresGuest: true } // Correcto
+            path: '/app',
+            component: GameLayout,
+            meta: { requiresAuth: true },
+            children: [
+                // 1. VISTAS PRINCIPALES
+                { path: 'dashboard', name: 'dashboard', component: DashboardView },
+                { path: 'kiosco', name: 'kiosco', component: KioscoView },
+
+                // 2. VISTAS DE LECCIONES Y MÓDULOS
+                // MÓDULOS GENERALES (Nivel Árbol)
+                { path: 'lecciones', name: 'lecciones', component: LeccionesView },
+
+                // MÓDULOS DE JUEGO (Nivel Brote)
+                {
+                    path: 'presupuesto',
+                    name: 'presupuesto-brote',
+                    component: PresupuestoView
+                },
+
+                // MÓDULOS DE JUEGO (Nivel Semilla)
+                {
+                    path: 'semilla',
+                    name: 'lecciones-semilla',
+                    component: SemillaView
+                },
+
+                // Rutas de Gestión (Profesor / Colegio)
+                {
+                    path: 'profesor',
+                    name: 'profesor-dashboard',
+                    component: () => import('../views/ProfesorDashboard.vue')
+                },
+
+                // --- RUTA DINÁMICA DE AVANCE DE ALUMNO ---
+                {
+                    path: 'avance/:id',
+                    name: 'avance-alumno',
+                    component: AvanceAlumnoView
+                },
+
+                // Vistas de Gestión Central (Colegio)
+                {
+                    path: 'retos-gestion',
+                    name: 'retos-gestion',
+                    component: () => import('../views/RetosView.vue')
+                },
+
+                // --- NUEVA RUTA DE ESTADÍSTICAS DEL COLEGIO ---
+                {
+                    path: 'estadisticas',
+                    name: 'estadisticas-colegio',
+                    component: () => import('../views/EstadisticasView.vue')
+                }
+            ]
         }
-      ]
-    },
-
-    // --- Rutas del Juego (usan GameLayout) ---
-    {
-      path: '/app',
-      component: GameLayout, // <-- "Envuelve" con el Layout del Juego
-      meta: { requiresAuth: true }, // <-- ¡PROTEGEMOS TODO EL LAYOUT!
-      children: [
-        // La ruta '/app/dashboard'
-        {
-          path: 'dashboard',
-          name: 'dashboard',
-          component: DashboardView
-          // No necesita meta individual, el 'padre' ya lo protege
-        },
-        // La ruta '/app/kiosco'
-        {
-          path: 'kiosco',
-          name: 'kiosco',
-          component: KioscoView
-          // No necesita meta individual, el 'padre' ya lo protege
-        }
-      ]
-    }
-  ]
+    ]
 });
 
-// --- 5. ¡TU GUARDIA DE SEGURIDAD! (Mejorado para Layouts) ---
+// --- 5. ¡TU GUARDIA DE SEGURIDAD! ---
 router.beforeEach((to, from, next) => {
-  const auth = useAuthStore();
-  const isAuthenticated = !!auth.token;
+    const auth = useAuthStore();
+    const isAuthenticated = !!auth.token;
 
-  // Esta lógica es la forma correcta de revisar 'metas' en rutas anidadas
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
+    const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
+    const requiresGuest = to.matched.some(record => record.meta.requiresGuest);
 
-  if (requiresAuth && !isAuthenticated) {
-    // Si la ruta requiere login y NO está logueado...
-    next({ name: 'login' }); // ...mándalo al login (usando el nombre).
-  } else if (requiresGuest && isAuthenticated) {
-    // Si la ruta es para invitados (login/register) y SÍ está logueado...
-    next({ name: 'dashboard' }); // ...mándalo al Dashboard (la app), no al home público.
-  } else {
-    // En cualquier otro caso, déjalo pasar.
-    next();
-  }
+    if (requiresAuth && !isAuthenticated) {
+        // Redirige al login si se requiere autenticación pero no está logueado
+        next({ name: 'login' });
+    } else if (requiresGuest && isAuthenticated) {
+        // Redirige al dashboard si ya está logueado pero intenta acceder a rutas de invitado
+        if (auth.user?.role === 'Estudiante') {
+            next({ name: 'dashboard' });
+        } else if (auth.user?.role === 'Profesor' || auth.user?.role === 'Colegio') {
+            next({ name: 'profesor-dashboard' });
+        } else {
+            next({ name: 'dashboard' }); // Fallback
+        }
+    } else {
+        next();
+    }
 });
 
 export default router;
