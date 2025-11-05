@@ -1,5 +1,89 @@
+@import "tailwindcss";
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+/* barra gradiente tipo “hero” */
+.hero-bar{
+  @apply rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-teal-300
+         px-6 py-3 backdrop-blur-md
+         ring-1 ring-white/10
+         shadow-[0_14px_36px_-14px_rgba(0,0,0,0.45)];
+}
+/* enlaces del menú */
+.nav-link{
+  @apply text-white/95 font-semibold tracking-wide drop-shadow hover:opacity-90;
+}
+/* botón contorno blanco (Iniciar sesión) */
+.btn-ghost{
+  @apply px-6 py-2 rounded-full border border-white/85 text-white
+         bg-white/10 hover:bg-white/20 transition shadow-[inset_0_0_0_1px_rgba(255,255,255,.25)];
+}
+/* botón gradiente (Registrarse) */
+.btn-primary{
+  @apply px-6 py-2 rounded-full font-bold text-white
+         bg-gradient-to-r from-rose-500 to-orange-400
+         shadow-lg hover:shadow-xl;
+}
+/* icono semilla con leve balanceo */
+@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(45deg)}}
+.plant-sway{animation:sway 2.8s ease-in-out infinite;}
+
+/* Utilidades personalizadas para tu look */
+@layer utilities {
+  .grad-footer{background:linear-gradient(180deg,#2F4154 0%,#101827 100%);} /* azul pedido */
+  .footer-divider{border-top:1px solid rgba(255,255,255,.08);}
+  .glow-seed{box-shadow:0 0 0 6px rgba(255,223,0,.12),0 12px 40px rgba(255,223,0,.35);}
+  .grad-hero{
+    background-image: linear-gradient(135deg,#FF6B6B 0%,#FFE66D 50%,#4ECDC4 100%);
+    box-shadow: 0 8px 24px rgba(0,0,0,.12);
+    border-bottom-left-radius: 16px; /* leve curva como en html */
+    border-bottom-right-radius: 16px;
+  }
+  .grad-pill{
+    background-image: linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%);
+  }
+  .animate-header-glow{ animation: headerGlow 3s ease-in-out infinite; }
+  .animate-bounce-soft{ animation: bounceSoft 2s ease-in-out infinite; }
+
+  /* Tarjeta con borde-degradado y vidrio suave */
+  .card-glass{
+    background: linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.92));
+    backdrop-filter: blur(6px);
+    box-shadow: 0 24px 60px rgba(0,0,0,.20);
+  }
+  .border-gradient{ position:relative; }
+  .border-gradient::before{
+    content:""; position:absolute; inset:-2px; z-index:-1; border-radius: inherit;
+    background: linear-gradient(45deg,#FF6B6B,#4ECDC4,#FFE66D,#FF6B6B);
+    background-size: 300% 300%; animation: borderFlow 6s linear infinite;
+  }
+
+  /* Botón degradado del login */
+  .btn-login-grad{
+    background-image: linear-gradient(135deg,#FF6B6B 0%,#4ECDC4 60%,#22D3EE 100%);
+    box-shadow: 0 8px 20px rgba(34,211,238,.25);
+  }
+  .btn-login-grad:hover{ filter:brightness(1.05); }
+
+  @keyframes sway{
+    0%,100%{transform:rotate(0deg); }
+    50%{transform:translateY(-2px) rotate(20deg); }
+  }
+  .animate-sway{
+    animation:sway 2.2s ease-in-out infinite}
+
+  /* tipografías y colores del footer */
+  .footer-title{ @apply text-white font-extrabold text-[clamp(1.6rem,3vw,2.3rem)] }
+  .footer-sub{ @apply text-slate-200/80 text-[clamp(1rem,2.2vw,1.25rem)] }
+  .footer-link{ @apply text-slate-200 hover:text-white transition }
+}
+
+@keyframes headerGlow{
+  0%,100%{ box-shadow:0 8px 28px rgba(255,107,107,.25); }
+  50%{ box-shadow:0 8px 28px rgba(78,205,196,.35); }
+}
+@keyframes bounceSoft{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
+@keyframes borderFlow{
+  0%{ background-position:0% 50% }
+  50%{ background-position:100% 50% }
+  100%{ background-position:0% 50% }
+}
 

@@ -1,9 +1,9 @@
-import './assets/main.css' // 1. Carga el diccionario de estilos
-
 import { createApp } from 'vue'
 import { createPinia, setActivePinia } from 'pinia' // Importamos createPinia y setActivePinia
 import App from './App.vue'
 import router from './router'
+
+import './assets/main.css' // 1. Carga el diccionario de estilos
 
 // 1. Crear la instancia de Vue
 const app = createApp(App)
