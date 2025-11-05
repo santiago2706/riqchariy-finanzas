@@ -1,91 +1,113 @@
 <script setup>
-import { ref } from 'vue';
-import { useRouter, RouterLink } from 'vue-router';
-import { useAuthStore } from '../stores/useAuthStore.js';
+import { ref, computed } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
+import { useAuthStore } from '@/stores/useAuthStore'
 
-const authStore = useAuthStore();
-const router = useRouter(); // Aunque la redirección principal es en el store, lo mantenemos por si es necesario para errores.
+const auth = useAuthStore()
+const router = useRouter()
+const route = useRoute()
 
-// 3. Variables para el formulario
-const email = ref('demo@example.com'); // Usamos el valor del primer bloque
-const password = ref('password123'); // Usamos el valor del primer bloque
-const isLoading = ref(false);
+const email = ref('')
+const password = ref('')
+const showPwd = ref(false)
+const remember = ref(true)
+const formError = ref('')
 
-// 4. Esta función se llama al presionar "Ingresar"
-const handleLogin = async () => {
-    if (!email.value || !password.value) {
-        // Mejoramos la notificación para que no use alert()
-        console.error('Por favor, ingresa email y contraseña');
-        // Aquí podrías implementar un sistema de toast o modal para el usuario
-        return;
-    }
+const isDisabled = computed(() => auth?.isLoading || !email.value || !password.value)
 
-    isLoading.value = true;
-
-    try {
-        // ⚠️ LA REDIRECCIÓN AHORA ES GESTIONADA POR EL useAuthStore.js
-        const success = await authStore.login(email.value, password.value);
-
-        if (!success) {
-            // Esto manejaría errores internos del store (p. ej., credenciales inválidas)
-            console.error('Error al iniciar sesión. Verifica tus credenciales.');
-        }
-        // Si es exitoso, ¡el store ya redirigió!
-    } catch (error) {
-        console.error('Error de red/API durante el login:', error);
-        // Mostrar un mensaje de error al usuario final
-        // alert('Hubo un error de conexión. Inténtalo de nuevo.');
-    } finally {
-        isLoading.value = false;
-    }
-};
+async function onSubmit(){
+  formError.value = ''
+  try{
+    await auth.login?.(email.value.trim(), password.value)
+    if(remember.value){ try{ localStorage.setItem('rq_auth','1') }catch{} }
+    router.push(route.query?.redirect?.toString?.() || '/')
+  }catch(err){
+    formError.value = (err?.message || auth?.error || 'No pudimos iniciar sesión.')
+  }
+}
 </script>
 
 <template>
-    <div class="flex items-center justify-center min-h-screen bg-gray-100">
-        <div class="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-md">
-            <h2 class="text-3xl font-bold text-center text-gray-900">
-                Bienvenido a Riqch'ariy
-            </h2>
-
-            <form class="space-y-6" @submit.prevent="handleLogin">
-                <div>
-                    <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
-                    <input
-                        v-model="email"
-                        id="email"
-                        type="email"
-                        required
-                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                </div>
-
-                <div>
-                    <label for="password" class="block text-sm font-medium text-gray-700">Contraseña</label>
-                    <input
-                        v-model="password"
-                        id="password"
-                        type="password"
-                        required
-                        class="w-full px-3 py-2 mt-1 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                    />
-                </div>
-
-                <button
-                    type="submit"
-                    :disabled="isLoading"
-                    class="w-full px-4 py-2 font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:bg-gray-400"
-                >
-                    {{ isLoading ? 'Cargando...' : 'Ingresar' }}
-                </button>
-            </form>
-
-            <p class="text-sm text-center text-gray-600">
-                ¿No tienes cuenta?
-                <RouterLink to="/register" class="text-blue-600 hover:underline font-medium">
-                    Crear cuenta
-                </RouterLink>
-            </p>
+  <section class="flex justify-center">
+    <div class="w-full max-w-xl">
+      <!-- Tarjeta -->
+      <div class="mt-8 rounded-[30px] ring-1 ring-black/10 overflow-hidden card-glass border-gradient">
+        <div class="px-8 pt-8 pb-4">
+          <h1 class="text-2xl font-extrabold text-emerald-800">¡Bienvenido de vuelta!<span aria-hidden="true"> 🎉👋</span></h1>
+          <p class="text-sm text-slate-600 mt-1">Ingresa a tu cuenta para continuar tu aventura financiera.</p>
         </div>
+
+        <form @submit.prevent="onSubmit" class="px-8 pb-8 space-y-5"> 
+          <div>
+            <label for="email" class="block text-sm font-semibold text-slate-800 mb-1">Correo Electrónico</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xl">📧</span>
+              <input
+                id="email"
+                v-model="email"
+                type="email"
+                required
+                autocomplete="email"
+                class="w-full pl-10 pr-4 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm
+                      focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all duration-300"
+                placeholder="tu.correo@ejemplo.com"
+              />
+            </div>
+          </div>
+
+          <div class="mt-4">
+            <label for="password" class="block text-sm font-semibold text-slate-800 mb-1">Contraseña</label>
+            <div class="relative">
+              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-xl">🔒</span>
+              <input
+                :type="showPwd ? 'text' : 'password'"
+                id="password"
+                v-model="password"
+                required
+                autocomplete="current-password"
+                class="w-full pl-10 pr-12 py-3 rounded-2xl bg-white border border-slate-200 shadow-sm
+                      focus:ring-2 focus:ring-emerald-400 focus:border-emerald-400 transition-all duration-300"
+                placeholder="••••••••"
+              />
+              <button
+                type="button"
+                @click="showPwd = !showPwd"
+                class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-700"
+                aria-label="Mostrar u ocultar contraseña"
+              >
+                <span v-if="!showPwd">👁️</span>
+                <span v-else>🙈</span>
+              </button>
+            </div>
+
+            <div class="text-right mt-2">
+              <RouterLink to="/reset" class="text-sm text-emerald-700 hover:underline">¿Olvidaste tu contraseña?</RouterLink>
+            </div>
+          </div>
+          
+          <label class="inline-flex items-center gap-2 text-sm text-slate-700">
+            <input type="checkbox" v-model="remember"
+                   class="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500">
+            Recordarme
+          </label>
+
+          <p v-if="formError || auth?.error"
+             class="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-3 py-2">
+            {{ formError || auth?.error }}
+          </p>
+
+          <button type="submit" :disabled="isDisabled"
+            class="w-full rounded-full py-3 font-extrabold tracking-wide text-white btn-login-grad
+                  hover:brightness-105 disabled:opacity-50 disabled:cursor-not-allowed">
+            INGRESAR 🚀
+          </button>
+        </form>
+      </div>
+
+      <p class="text-center text-sm text-slate-600 mt-4">
+        ¿Aún no tienes una cuenta?
+        <RouterLink to="/register" class="text-emerald-700 font-semibold hover:underline">Regístrate aquí</RouterLink>
+      </p>
     </div>
+  </section>
 </template>
