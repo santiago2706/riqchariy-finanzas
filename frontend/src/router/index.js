@@ -48,13 +48,13 @@ const router = createRouter({
                     component: RegisterView,
                     meta: { requiresGuest: true }
                 },
-                // --- RUTA DE DIAGNÓSTICO ---
-                {
+                // --- RUTA DE DIAGNÓSTICO (MOVIDA A /app) ---
+                /* {
                     path: 'diagnostico',
                     name: 'diagnostico',
                     component: DiagnosticoView,
                     meta: { requiresAuth: true }
-                }
+                } */
             ]
         },
 
@@ -67,6 +67,13 @@ const router = createRouter({
                 // 1. VISTAS PRINCIPALES
                 { path: 'dashboard', name: 'dashboard', component: DashboardView },
                 { path: 'kiosco', name: 'kiosco', component: KioscoView },
+
+                // ✅ RUTA DE DIAGNÓSTICO (MOVIMIENTO CLAVE)
+                {
+                    path: 'diagnostico',
+                    name: 'diagnostico',
+                    component: DiagnosticoView
+                },
 
                 // 2. VISTAS DE LECCIONES Y MÓDULOS
                 // MÓDULOS GENERALES (Nivel Árbol)
@@ -137,6 +144,14 @@ router.beforeEach((to, from, next) => {
             next({ name: 'profesor-dashboard' });
         } else {
             next({ name: 'dashboard' }); // Fallback
+        }
+    } else if (isAuthenticated && auth.user?.role === 'Estudiante' && !auth.user.level) {
+        // ✅ REGLA DE SEGURIDAD ADICIONAL: Fuerza la redirección a 'diagnostico'
+        // si el estudiante no tiene nivel, evitando el acceso directo a otras rutas de juego.
+        if (to.name !== 'diagnostico') {
+            next({ name: 'diagnostico' });
+        } else {
+            next();
         }
     } else {
         next();
