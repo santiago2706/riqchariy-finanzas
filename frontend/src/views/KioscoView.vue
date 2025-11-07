@@ -9,17 +9,17 @@ const kiosco = useKioscoStore();
 const market = useMarketStore(); // <-- ¡AÑADIDO!
 
 // --- FUNCIONES DE LA TIENDA ---
+// Estas funciones de 'comprar/vender' del kioscoStore
+// pueden seguir funcionando para manejar la lógica del inventario local.
 function comprarProducto(product) {
   kiosco.buyProduct(product, 1);
 }
 
 function venderProducto(item) {
-  // La función 'sellProduct' de tu store espera el 'item' del inventario
   kiosco.sellProduct(item, 1);
 }
 
 function venderProductoDesdeEstante(product) {
-  // Para el botón "Vender 1" de la tarjeta de compra
   const itemInInventory = kiosco.inventory.find(item => item.product.id === product.id);
   if (itemInInventory) {
     kiosco.sellProduct(itemInInventory, 1);
@@ -28,21 +28,26 @@ function venderProductoDesdeEstante(product) {
   }
 }
 
-// --- 2. FUNCIÓN PARA CAMBIAR EL DÍA (¡AÑADIDA!) ---
-// Esto activa la dificultad creciente y los eventos
+// --- 2. FUNCIÓN PARA CAMBIAR EL DÍA (¡SIMPLIFICADA!) ---
+// 'market.advanceDay()' ya actualiza 'market.products' desde el backend.
+// Ya no necesitamos la sincronización manual.
 async function handleAdvanceDay() {
   await market.advanceDay();
-
-  // Sincroniza la tienda con los nuevos precios del mercado
-  kiosco.updateProductsFromMarket(market.products);
+  
+  // NOTA: 'kiosco.updateProductsFromMarket' ya no es necesario
+  // si el template lee directamente de 'market.products'.
 }
 
-// --- 3. CARGA INICIAL (¡AÑADIDA!) ---
+// --- 3. CARGA INICIAL (¡CORREGIDA!) ---
 onMounted(() => {
-  // Carga los productos en la tienda si no están
-  if (kiosco.products.length === 0) {
-    kiosco.loadProducts(kiosco.currentRegion);
-  }
+  // ¡CAMBIO CLAVE!
+  // Llamamos a la nueva función que habla con el backend (main.py)
+  market.fetchInitialProducts();
+
+  // El 'kiosco.loadProducts' simulado ya no se usa.
+  // if (kiosco.products.length === 0) {
+  //     kiosco.loadProducts(kiosco.currentRegion);
+  // }
 });
 </script>
 
@@ -70,16 +75,24 @@ onMounted(() => {
           {{ market.isUpdating ? 'Avanzando...' : 'Avanzar al Siguiente Día' }}
         </button>
       </div>
+      
+      <!-- ¡CAMBIO MENOR! main.py devuelve un string, no un objeto .message -->
       <div v-if="market.marketEvent" class="mt-4 p-3 bg-blue-100 text-blue-800 rounded-lg">
-        <p><strong class="font-bold">¡Evento del Día!</strong> {{ market.marketEvent.message }}</p>
+        <p><strong class="font-bold">¡Evento del Día!</strong> {{ market.marketEvent }}</p>
       </div>
     </section>
+
     <h2 class="text-3xl font-bold text-gray-800 mb-6">Productos (Compra)</h2>
+    
+    <!-- Mantenemos el isLoading del kiosco por si se usa para el inventario -->
     <div v-if="kiosco.isLoading" class="text-center text-gray-500 py-10">
-      </div>
-    <div v-else-if="kiosco.products && kiosco.products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      Cargando...
+    </div>
+    
+    <!-- ¡CAMBIO CLAVE! Leemos de 'market.products' -->
+    <div v-else-if="market.products && market.products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       <ProductCard
-        v-for="prod in kiosco.products"
+        v-for="prod in market.products" 
         :key="prod.id"
         :product="prod"
         @comprar="comprarProducto"
@@ -87,12 +100,14 @@ onMounted(() => {
       />
     </div>
     <div v-else class="text-center text-gray-400 py-10">
-      </div>
+      No hay productos en el mercado.
+    </div>
 
     <hr class="my-10 border-gray-300">
     <section class="inventory-section">
       <h2 class="text-3xl font-bold text-gray-800 mb-6">Tu Inventario (Venta)</h2>
 
+      <!-- El inventario sigue siendo manejado por 'kioscoStore', eso está bien. -->
       <div v-if="kiosco.inventory && kiosco.inventory.length > 0" class="flex flex-col gap-4">
         <div
           v-for="item in kiosco.inventory"
@@ -101,7 +116,8 @@ onMounted(() => {
         >
           <div>
             <strong class="text-gray-800 text-lg">{{ item.product.name }}</strong>
-            <p class="text-sm text-gray-500">Costo: ${{ item.product.cost.toFixed(2) }}</p>
+            <!-- Asumimos que el inventario guarda el 'cost' (precio de compra) -->
+            <p class="text-sm text-gray-500">Costo: ${{ item.product.cost ? item.product.cost.toFixed(2) : 'N/A' }}</p>
           </div>
 
           <div>

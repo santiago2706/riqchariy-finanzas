@@ -1,6 +1,5 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
-import { fetchProductsByRegion } from '../services/kioscoApi.js';
 
 // NOTA IMPORTANTE: Para evitar el problema de dependencia circular con useMarketStore,
 // NO lo importamos aquí. Lo importaremos dinámicamente dentro de las acciones.

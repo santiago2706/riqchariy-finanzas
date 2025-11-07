@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 import { login as apiLogin, register as apiRegister } from '../services/authApi.js';
 import router from '../router/index.js';
 import { useKioscoStore } from './useKioscoStore';
-import { useMarketStore } from './useMarketStore';
+
 import { fetchGameState } from '../services/transactionApi.js';
 
 export const useAuthStore = defineStore('auth', () => {
@@ -60,16 +60,14 @@ export const useAuthStore = defineStore('auth', () => {
                         console.log('[Auth Store]: Login exitoso. Intentando cargar datos del juego...');
                         const savedState = await fetchGameState();
                         const kioscoStore = useKioscoStore();
-                        const marketStore = useMarketStore();
 
                         // Carga estado de juego (saldo, inventario, día, región)
                         kioscoStore.loadState(savedState.inventario, savedState.saldo, savedState.day, user.value.region);
-                        marketStore.loadState(savedState.day);
 
                     } catch (loadError) {
                         // ⚠️ ARREGLO CLAVE: Si la carga falla, SOLO mostramos el error, pero NO rompemos
                         // la función 'login' ni forzamos logout.
-                        console.error('⚠️ Advertencia: Error al cargar el estado del juego (Simulación rota):', loadError);
+                        console.error('⚠️  Advertencia: Error al cargar el estado del juego (saldo/inventario):', loadError);
                     }
                 }
 

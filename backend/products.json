@@ -1,0 +1,47 @@
+[
+  {
+    "id": "prod_01",
+    "name": "Bebida Energética (300ml)",
+    "region": "Lima",
+    "price": 3.50,
+    "cost": 2.00,
+    "local_demand": "alta",
+    "offer_stage": "Brote"
+  },
+  {
+    "id": "prod_02",
+    "name": "Caramelo de Menta (unidad)",
+    "region": "Lima",
+    "price": 0.50,
+    "cost": 0.10,
+    "local_demand": "baja",
+    "offer_stage": "Desarrollo"
+  },
+  {
+    "id": "prod_03",
+    "name": "Jugo de Camu Camu",
+    "region": "Iquitos",
+    "price": 4.00,
+    "cost": 2.50,
+    "local_demand": "alta",
+    "offer_stage": "Brote"
+  },
+  {
+    "id": "prod_04",
+    "name": "Hojuelas de Plátano",
+    "region": "Iquitos",
+    "price": 2.50,
+    "cost": 1.50,
+    "local_demand": "media",
+    "offer_stage": "Brote"
+  },
+  {
+    "id": "prod_05",
+    "name": "Chicha Morada",
+    "region": "Cusco",
+    "price": 2.00,
+    "cost": 1.00,
+    "local_demand": "alta",
+    "offer_stage": "Desarrollo"
+  }
+]
