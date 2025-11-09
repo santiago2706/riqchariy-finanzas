@@ -1,7 +1,7 @@
 <script setup></script>
 
 <template>
-  <footer class="bg-[#2F4154] text-white">
+  <footer id="contacto" class="bg-[#2F4154] text-white">
     <div class="mx-auto max-w-6xl px-6 py-14 flex flex-col items-center text-center">
       
       <!-- Logo e título -->
