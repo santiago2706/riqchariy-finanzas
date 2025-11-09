@@ -4,7 +4,7 @@ import { RouterLink } from 'vue-router'
 
 <template>
   <!-- Header a ancho completo -->
-  <div class="sticky top-0 z-50">
+  <div class="fixed top-0 inset-x-0 z-50">
     <!-- Barra de fondo gradiente a 100% -->
     <div class="w-full bg-gradient-to-r from-rose-400 via-amber-300 via-yellow-300 via-lime-300 to-teal-400 shadow-[0_12px_40px_-10px_rgba(0,0,0,0.25)]">
       <!-- Contenido centrado -->
@@ -18,12 +18,14 @@ import { RouterLink } from 'vue-router'
         </RouterLink>
 
         <!-- menú -->
-        <nav class="hidden md:flex items-center gap-8">
-          <RouterLink to="/" class="nav-link">Inicio</RouterLink>
-          <RouterLink to="/" class="nav-link">Características</RouterLink>
-          <RouterLink to="/" class="nav-link">Etapas</RouterLink>
-          <RouterLink to="/" class="nav-link">Familia</RouterLink>
+        <nav class="hidden md:flex items-center gap-6 font-semibold text-white">
+          <RouterLink :to="{ name:'home', hash:'#inicio' }" class="hover:underline">Inicio</RouterLink>
+          <RouterLink :to="{ name:'home', hash:'#caracteristicas' }" class="hover:underline">Características</RouterLink>
+          <RouterLink :to="{ name:'home', hash:'#etapas' }" class="hover:underline">Etapas</RouterLink>
+          <RouterLink :to="{ name:'home', hash:'#familia' }" class="hover:underline">Familia</RouterLink>
+          <RouterLink :to="{ name:'home', hash:'#contacto' }" class="hover:underline">Contacto</RouterLink>
         </nav>
+
 
         <!-- acciones -->
         <div class="hidden md:flex items-center gap-3">

@@ -28,8 +28,8 @@ async function onSubmit(){
 </script>
 
 <template>
-  <section class="flex justify-center">
-    <div class="w-full max-w-xl">
+  <section class="auth-wrapper flex justify-center">
+    <div class="auth-card w-full max-w-xl">
       <!-- Tarjeta -->
       <div class="mt-8 rounded-[30px] ring-1 ring-black/10 overflow-hidden card-glass border-gradient">
         <div class="px-8 pt-8 pb-4">
@@ -104,10 +104,13 @@ async function onSubmit(){
         </form>
       </div>
 
-      <p class="text-center text-sm text-slate-600 mt-4">
+      <p class="auth-switch text-center text-sm text-slate-600 mt-4">
         ¿Aún no tienes una cuenta?
         <RouterLink to="/register" class="text-emerald-700 font-semibold hover:underline">Regístrate aquí</RouterLink>
       </p>
     </div>
   </section>
 </template>
+<style scoped>
+.auth-wrapper{padding-bottom:35px;}
+</style>
