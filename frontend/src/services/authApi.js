@@ -1,28 +1,28 @@
 // src/services/authApi.js
 import apiClient from "./apiClient";
 
-// 🔐 Iniciar sesión
+// login (body JSON)
 export const login = async (email, password) => {
   try {
-    const response = await apiClient.post("/auth/login", null, {
-      params: { gmail: email, password },
+    const response = await apiClient.post("/auth/login", {
+      gmail: email,
+      password,
     });
     return response.data; // { success, user, token, message }
   } catch (error) {
     console.error("Error en login:", error);
-    return { success: false, message: "Error al conectar con el servidor" };
+    // devolver estructura esperada por el store
+    return { success: false, message: error.response?.data?.detail || "Error al conectar con el servidor" };
   }
 };
 
-// 🧾 Registrar usuario
+// register (body JSON)
 export const register = async (userData) => {
   try {
-    const response = await apiClient.post("/auth/register", null, {
-      params: userData,
-    });
+    const response = await apiClient.post("/auth/register", userData);
     return response.data; // { success, user, token, message }
   } catch (error) {
     console.error("Error en register:", error);
-    return { success: false, message: "Error al registrar el usuario" };
+    return { success: false, message: error.response?.data?.detail || "Error al registrar el usuario" };
   }
 };

@@ -1,47 +1,55 @@
+# =====================================================
+# 🧠 Riqch'ariy Finanzas - Backend Principal
+# =====================================================
 from fastapi import FastAPI, Query
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
 from typing import List
 import random
 import json
-from database import engine
-from models import Base
 
-Base.metadata.create_all(bind=engine)
 # =====================================================
-# ⚙️ IMPORTS ABSOLUTOS
+# ⚙️ IMPORTS INTERNOS
 # =====================================================
 import models
 from database import engine
 from auth import router as auth_router
 from chatbot.router import router as chatbot_router
+# from market import router as market_router
 
 # =====================================================
-# ⚙️ CREACIÓN DE LA APP
+# ⚙️ CONFIGURACIÓN DE LA APP
 # =====================================================
 app = FastAPI(
     title="Riqch'ariy Finanzas - Backend AI",
-    description="Simulación económica educativa con IA y contexto financiero",
+    description="Simulación económica educativa con IA y autenticación de usuarios",
     version="1.0.0"
 )
 
 # =====================================================
-# 🔒 CONFIGURAR CORS
+# 🔒 CORS
 # =====================================================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # 🔒 Cambiar por tu dominio frontend en producción
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 # =====================================================
-# 🗂️ REGISTRO DE MODELOS Y ROUTERS
+# 🗂️ INICIALIZACIÓN DE MODELOS Y ROUTERS
 # =====================================================
 models.Base.metadata.create_all(bind=engine)
-app.include_router(auth_router, prefix="/auth", tags=["Auth"])
-app.include_router(chatbot_router)  # ya tiene su propio prefix interno
+
+# 🔐 Autenticación (login / register)
+# CORRECCIÓN APLICADA: Se eliminó 'prefix="/auth"'
+app.include_router(auth_router, tags=["Auth"])
+
+# 🤖 Chatbot con IA
+app.include_router(chatbot_router, prefix="/chatbot", tags=["Chatbot"])
+
+# app.include_router(market_router, prefix="/market", tags=["Market"])
 
 # =====================================================
 # 📦 CONFIGURACIÓN DE PRODUCTOS
@@ -60,11 +68,9 @@ class Product(BaseModel):
     local_demand: str
     offer_stage: str
 
-
 class EstadoJuegoInput(BaseModel):
     dia_actual: int
     products: List[Product]
-
 
 class NuevoEstadoMercado(BaseModel):
     nuevo_dia: int
@@ -72,11 +78,9 @@ class NuevoEstadoMercado(BaseModel):
     pedagogical_focus: str | None
     products: List[Product]
 
-
 class InventarioItem(BaseModel):
     product: Product
     quantity: int
-
 
 class EstadoJuegoGuardado(BaseModel):
     day: int
@@ -84,20 +88,19 @@ class EstadoJuegoGuardado(BaseModel):
     marketEvent: str | None
     saldo: float
 
-
 class EstadoJuegoParaGuardar(BaseModel):
     saldo: float
     inventario: List[InventarioItem]
     day: int
 
 # =====================================================
-# 🧠 FUNCIÓN PARA CARGAR PRODUCTOS
+# 🧠 FUNCIONES AUXILIARES
 # =====================================================
 def load_products_from_json() -> List[Product]:
+    """Carga los productos desde products.json con validación Pydantic."""
     try:
         with open(PRODUCTS_FILE, "r", encoding="utf-8") as f:
             data = json.load(f)
-
         products = []
         for item in data:
             try:
@@ -109,9 +112,8 @@ def load_products_from_json() -> List[Product]:
                 print("=" * 60)
         print(f"✅ {len(products)} productos cargados desde {PRODUCTS_FILE}")
         return products
-
     except FileNotFoundError:
-        print(f"❌ {PRODUCTS_FILE} no encontrado. Lista vacía creada.")
+        print(f"❌ {PRODUCTS_FILE} no encontrado.")
         return []
     except json.JSONDecodeError as jde:
         print(f"❌ JSON inválido → {jde}")
@@ -120,24 +122,16 @@ def load_products_from_json() -> List[Product]:
         print(f"❌ Error inesperado → {e}")
         return []
 
-# =====================================================
-# 🔍 FILTRADO DE PRODUCTOS
-# =====================================================
 def filter_products_by_region(all_products: List[Product], region: str) -> List[Product]:
     region_lower = region.lower()
-    filtered = [
+    return [
         p for p in all_products
         if p.region.lower() == region_lower or p.region.lower() == "global"
     ]
-    print(f"🔎 {len(filtered)} productos filtrados para región: {region}")
-    return filtered
 
-# =====================================================
-# 💹 MOTOR DEL MERCADO
-# =====================================================
 def calcular_motor_mercado(dia: int, productos: List[Product]) -> tuple[List[Product], str | None, str | None]:
-    evento = None
-    foco_pedagogico = None
+    """Genera la nueva simulación del mercado."""
+    evento, foco_pedagogico = None, None
 
     if dia % 5 == 0:
         evento = "¡Feria gastronómica! Precios de comida suben."
@@ -151,7 +145,6 @@ def calcular_motor_mercado(dia: int, productos: List[Product]) -> tuple[List[Pro
     productos_actualizados = []
     for p in productos:
         producto_actualizado = p.model_copy()
-
         producto_actualizado.local_demand = random.choice(["alta", "media", "baja"])
         producto_actualizado.offer_stage = random.choice(["Brote", "Desarrollo", "Estable"])
 
@@ -177,47 +170,40 @@ def calcular_motor_mercado(dia: int, productos: List[Product]) -> tuple[List[Pro
     return productos_actualizados, evento, foco_pedagogico
 
 # =====================================================
-# 🚀 ENDPOINTS DE LA API
+# 🚀 ENDPOINTS DEL JUEGO Y MERCADO
 # =====================================================
 initial_products_list = load_products_from_json()
 
-
 @app.post("/api/mercado/avanzar-dia")
 async def avanzar_dia_mercado(estado_input: EstadoJuegoInput) -> NuevoEstadoMercado:
-    productos_actualizados, evento, foco_pedagogico = calcular_motor_mercado(
-        estado_input.dia_actual,
-        estado_input.products
+    productos_actualizados, evento, foco = calcular_motor_mercado(
+        estado_input.dia_actual, estado_input.products
     )
     return NuevoEstadoMercado(
         nuevo_dia=estado_input.dia_actual + 1,
         evento_regional=evento,
-        pedagogical_focus=foco_pedagogico,
+        pedagogical_focus=foco,
         products=productos_actualizados
     )
-
 
 @app.get("/api/productos/iniciales")
 async def obtener_productos_iniciales(region: str = Query(..., min_length=1)) -> List[Product]:
     return filter_products_by_region(initial_products_list, region)
 
-
 @app.get("/api/game/load", response_model=EstadoJuegoGuardado)
 async def cargar_partida_guardada(region: str = Query(..., min_length=1)) -> EstadoJuegoGuardado:
     productos_filtrados = filter_products_by_region(load_products_from_json(), region)
-    sim_inventario = []
-
+    inventario_simulado = []
     if productos_filtrados:
-        producto_simulado = productos_filtrados[0].model_copy()
-        producto_simulado.price = 4.10
-        sim_inventario.append(InventarioItem(product=producto_simulado, quantity=20))
-
+        producto = productos_filtrados[0].model_copy()
+        producto.price = 4.10
+        inventario_simulado.append(InventarioItem(product=producto, quantity=20))
     return EstadoJuegoGuardado(
         day=5,
-        inventario=sim_inventario,
+        inventario=inventario_simulado,
         marketEvent="Sequía - Precios de bebidas altos",
         saldo=999.50
     )
-
 
 @app.post("/api/game/save")
 async def guardar_partida(estado: EstadoJuegoParaGuardar):
@@ -228,3 +214,10 @@ async def guardar_partida(estado: EstadoJuegoParaGuardar):
     print(f"Items: {len(estado.inventario)}")
     print("=" * 30)
     return {"status": 200, "message": "Juego guardado"}
+
+# =====================================================
+# 🏁 RUTA PRINCIPAL
+# =====================================================
+@app.get("/")
+def root():
+    return {"message": "Bienvenido a Riqch'ariy Finanzas API"}

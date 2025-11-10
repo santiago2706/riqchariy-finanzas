@@ -11,11 +11,16 @@ class TemaFinanciero(Base):
 class User(Base):
     __tablename__ = "users"
     id = Column(Integer, primary_key=True, index=True)
-    nombre = Column(String, nullable=False)
-    apellido = Column(String, nullable=False)
+    nombre = Column(String(255), nullable=False)
+    apellido = Column(String(255), nullable=False)
     edad = Column(Integer, nullable=False)
     gmail = Column(String(100), unique=True, index=True, nullable=False)
     password = Column(String(100), nullable=False)
+    
+    # Columnas agregadas para Tipo de Perfil y Región de Juego
+    role = Column(String(50), nullable=False, default="Estudiante")
+    region = Column(String(50), nullable=False, default="Lima")
+    # --------------------------------
 
     @staticmethod
     def hash_password(password: str) -> str:

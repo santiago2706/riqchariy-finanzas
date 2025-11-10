@@ -1,22 +1,21 @@
+// src/stores/useAuthStore.js
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { login as apiLogin, register as apiRegister } from '../services/authApi.js';
 import router from '../router/index.js';
 import { useKioscoStore } from './useKioscoStore';
-
 import { fetchGameState } from '../services/transactionApi.js';
 
 export const useAuthStore = defineStore('auth', () => {
-    // 1. ESTADO
-    // Inicializamos como null. La carga desde localStorage se hará explícitamente con initialize().
+    // =====================================================
+    // 🧩 ESTADO
+    // =====================================================
     const user = ref(null);
     const token = ref(null);
 
-    // --- LÓGICA DE CARGA DIFERIDA ---
-    /**
-     * Carga el estado de autenticación (user y token) desde el localStorage.
-     * Esta función debe ser llamada en el setup inicial de App.vue.
-     */
+    // =====================================================
+    // ⚙️ INICIALIZACIÓN
+    // =====================================================
     function initialize() {
         try {
             const savedUser = localStorage.getItem('user');
@@ -25,8 +24,8 @@ export const useAuthStore = defineStore('auth', () => {
             user.value = savedUser ? JSON.parse(savedUser) : null;
             token.value = savedToken || null;
 
+            // Limpieza si hay inconsistencia
             if (savedUser && !savedToken) {
-                // Limpieza si solo hay usuario pero no token (estado inconsistente)
                 localStorage.removeItem('user');
                 user.value = null;
             }
@@ -39,52 +38,46 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    // 2. ACCIONES
-
-    /**
-     * 🔐 LOGIN: Maneja la carga de estado y la redirección por ROL.
-     */
+    // =====================================================
+    // 🔐 LOGIN
+    // =====================================================
     async function login(email, password) {
         try {
+            // En authApi el campo se llama "gmail", así que no hay conflicto
             const response = await apiLogin(email, password);
 
             if (response.success) {
                 user.value = response.user;
                 token.value = response.token;
+
                 localStorage.setItem('user', JSON.stringify(response.user));
                 localStorage.setItem('token', response.token);
 
-                // --- Lógica de Carga de Juego (Aislada con try...catch) ---
+                // --- Si el usuario es estudiante, intentar cargar estado de juego ---
                 if (user.value.role === 'Estudiante') {
                     try {
                         console.log('[Auth Store]: Login exitoso. Intentando cargar datos del juego...');
                         const savedState = await fetchGameState();
                         const kioscoStore = useKioscoStore();
 
-                        // Carga estado de juego (saldo, inventario, día, región)
-                        kioscoStore.loadState(savedState.inventario, savedState.saldo, savedState.day, user.value.region);
-
+                        kioscoStore.loadState(
+                            savedState.inventario,
+                            savedState.saldo,
+                            savedState.day,
+                            user.value.region
+                        );
                     } catch (loadError) {
-                        // ⚠️ ARREGLO CLAVE: Si la carga falla, SOLO mostramos el error, pero NO rompemos
-                        // la función 'login' ni forzamos logout.
-                        console.error('⚠️  Advertencia: Error al cargar el estado del juego (saldo/inventario):', loadError);
+                        console.warn('⚠️ No se pudo cargar el estado del juego:', loadError);
                     }
                 }
 
-                // --- Lógica de Redirección por ROL y Nivel ---
+                // --- Redirección por rol ---
                 if (user.value.role === 'Estudiante') {
-                    if (!user.value.level) {
-                        // Estudiante sin nivel -> Diagnóstico
-                        router.push({ name: 'diagnostico' });
-                    } else {
-                        // Estudiante con nivel -> Dashboard de juego
-                        router.push({ name: 'dashboard' });
-                    }
+                    router.push({ name: user.value.level ? 'dashboard' : 'diagnostico' });
                 } else if (user.value.role === 'Profesor' || user.value.role === 'Colegio') {
-                    // Gestión (Profesor/Colegio) -> Dashboard de gestión
                     router.push({ name: 'profesor-dashboard' });
                 } else {
-                    router.push({ name: 'dashboard' }); // Default (por si acaso)
+                    router.push({ name: 'dashboard' });
                 }
 
                 return true;
@@ -98,31 +91,42 @@ export const useAuthStore = defineStore('auth', () => {
         }
     }
 
-    /**
-     * 🧾 REGISTER: Guarda la información completa del perfil.
-     */
+    // =====================================================
+    // 🧾 REGISTER (CORREGIDO)
+    // =====================================================
     async function register(userData) {
         try {
             const response = await apiRegister(userData);
 
             if (response.success) {
-                console.log('Usuario registrado correctamente. Ahora puedes iniciar sesión.');
-                // Redirigimos al Login
+                console.log('✅ Usuario registrado correctamente.');
                 router.push({ name: 'login' });
-                return true;
+                return { success: true }; // Devuelve un objeto claro
             } else {
+                // Esto maneja errores 400 (usuario ya existe)
                 console.error(response.message || 'Error al registrar el usuario.');
-                return false;
+                return { success: false, errors: [response.message || 'Error desconocido'] };
             }
         } catch (error) {
             console.error('Error en register:', error);
-            return false;
+
+            // 🛑 CORRECCIÓN CLAVE: Manejar el error 422 (AxiosError)
+            if (error.response && error.response.status === 422) {
+                // 422 de FastAPI/Pydantic devuelve un objeto 'detail' con la lista de errores.
+                const pydanticErrors = error.response.data.detail;
+                console.error('Errores de validación (Pydantic):', pydanticErrors);
+
+                // Devuelve los errores de Pydantic al componente que llamó a 'register'
+                return { success: false, errors: pydanticErrors };
+            }
+
+            return { success: false, errors: ['Error al conectar o registrar el usuario.'] };
         }
     }
 
-    /**
-     * 🚪 LOGOUT
-     */
+    // =====================================================
+    // 🚪 LOGOUT
+    // =====================================================
     function logout() {
         user.value = null;
         token.value = null;
@@ -131,18 +135,16 @@ export const useAuthStore = defineStore('auth', () => {
         router.push({ name: 'login' });
     }
 
-    /**
-     * 🧑‍🎓 ASIGNAR NIVEL: Guarda el nivel asignado después del diagnóstico
-     */
+    // =====================================================
+    // 🧩 ASIGNAR NIVEL (después del diagnóstico)
+    // =====================================================
     function assignLevel(level) {
         if (user.value) {
             user.value.level = level;
-            // Actualizar localStorage inmediatamente
             localStorage.setItem('user', JSON.stringify(user.value));
         }
     }
 
-    // --- DEVUELVE LAS ACCIONES Y ESTADO ---
     return {
         user,
         token,
@@ -150,6 +152,6 @@ export const useAuthStore = defineStore('auth', () => {
         register,
         logout,
         assignLevel,
-        initialize // 👈 EXPORTAMOS LA FUNCIÓN DE INICIALIZACIÓN
+        initialize
     };
 });
