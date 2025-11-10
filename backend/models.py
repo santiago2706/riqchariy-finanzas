@@ -1,39 +1,25 @@
-import json
+from sqlalchemy import Column, Integer, String, Text
+from database import Base
 import bcrypt
 
-USERS_FILE = "users.json"
+class TemaFinanciero(Base):
+    __tablename__ = "temas_financieros"
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String(100), unique=True, index=True)
+    descripcion = Column(Text)
 
-def load_users():
-    try:
-        with open(USERS_FILE, "r") as f:
-            return json.load(f)
-    except FileNotFoundError:
-        return []
+class User(Base):
+    __tablename__ = "users"
+    id = Column(Integer, primary_key=True, index=True)
+    nombre = Column(String, nullable=False)
+    apellido = Column(String, nullable=False)
+    edad = Column(Integer, nullable=False)
+    gmail = Column(String(100), unique=True, index=True, nullable=False)
+    password = Column(String(100), nullable=False)
 
-def save_users(users):
-    with open(USERS_FILE, "w") as f:
-        json.dump(users, f, indent=4)
+    @staticmethod
+    def hash_password(password: str) -> str:
+        return bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
 
-def find_user_by_email(email):
-    users = load_users()
-    for u in users:
-        if u["gmail"] == email:
-            return u
-    return None
-
-def create_user(nombre, apellido, edad, gmail, password):
-    users = load_users()
-    if find_user_by_email(gmail):
-        return None  # Ya existe el usuario
-
-    hashed_pw = bcrypt.hashpw(password.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
-    new_user = {
-        "nombre": nombre,
-        "apellido": apellido,
-        "edad": edad,
-        "gmail": gmail,
-        "password": hashed_pw
-    }
-    users.append(new_user)
-    save_users(users)
-    return new_user
+    def verify_password(self, password: str) -> bool:
+        return bcrypt.checkpw(password.encode("utf-8"), self.password.encode("utf-8"))

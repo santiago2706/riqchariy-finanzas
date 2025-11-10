@@ -1,94 +1,62 @@
-import { useAuthStore } from '../stores/useAuthStore';
-import { useKioscoStore } from '../stores/useKioscoStore'; // Necesario para 'save'
+// src/services/transactionApi.js
+import apiClient from "./apiClient";
+import { useAuthStore } from "../stores/useAuthStore";
+import { useKioscoStore } from "../stores/useKioscoStore";
 
 /**
- * Guarda el estado del juego en el backend real.
- * Llama a: POST /api/game/save
- * @param {number} saldo El saldo actual del jugador.
- * @param {Array} inventario El inventario actual.
+ * Guarda el estado del juego en el backend
+ * POST /api/game/save
  */
 export const saveGameToApi = async (saldo, inventario) => {
-    console.log('[API]: Guardando estado real en backend...');
+  const kioscoStore = useKioscoStore();
+  const day = kioscoStore.day;
 
-    // Para guardar la partida completa, también necesitamos el día actual.
-    // Lo sacamos del kioscoStore.
-    const kioscoStore = useKioscoStore();
-    const day = kioscoStore.day;
-
-    // (Opcional) Si tuvieras tokens, los sacarías del authStore
-    // const authStore = useAuthStore();
-    // const token = authStore.token;
-
-    try {
-        const response = await fetch('/api/game/save', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${token}` // <-- Así lo harías con tokens
-            },
-            body: JSON.stringify({
-                saldo: saldo,
-                inventario: inventario,
-                day: day 
-            })
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error del servidor: ${response.status}`);
-        }
-
-        const data = await response.json();
-        console.log(`[API]: ¡Éxito! Backend dice: "${data.message}"`);
-        return data; // Devuelve { status: 200, message: "Juego guardado" }
-
-    } catch (error) {
-        console.error('Error al guardar el juego:', error);
-        return { status: 500, message: "Error al guardar" };
-    }
+  try {
+    const response = await apiClient.post("/api/game/save", {
+      saldo,
+      inventario,
+      day,
+    });
+    console.log("[API]: Juego guardado con éxito", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error al guardar el juego:", error);
+    return { status: 500, message: "Error al guardar en el servidor" };
+  }
 };
 
 /**
- * Carga el estado del juego desde el backend real.
- * Llama a: GET /api/game/load
+ * Carga el estado del juego
+ * GET /api/game/load?region=...
  */
 export const fetchGameState = async () => {
-    console.log('[API]: Cargando estado real desde backend...');
+  const authStore = useAuthStore();
+  if (!authStore.user?.region) {
+    throw new Error("Usuario no autenticado o sin región");
+  }
 
-    // 1. Necesitamos la región para filtrar
-    const authStore = useAuthStore();
-    if (!authStore.user || !authStore.user.region) {
-        console.error('fetchGameState: No hay usuario o región en el AuthStore.');
-        throw new Error('Usuario no autenticado o sin región.');
-    }
-    
-    const userRegion = authStore.user.region;
-    // const token = authStore.token; // (Para autenticación)
+  try {
+    const response = await apiClient.get("/api/game/load", {
+      params: { region: authStore.user.region },
+    });
+    console.log("[API]: Estado de juego cargado", response.data);
+    return response.data;
+  } catch (error) {
+    console.error("Error al cargar el juego:", error);
+    throw error;
+  }
+};
 
-    console.log(`[API]: Solicitando estado del juego para la región: ${userRegion}`);
-
-    try {
-        // 2. Construimos la URL con el Query Parameter
-        const response = await fetch(`/api/game/load?region=${encodeURIComponent(userRegion)}`, {
-            method: 'GET',
-            headers: {
-                'Content-Type': 'application/json',
-                // 'Authorization': `Bearer ${token}` // <-- Así lo harías con tokens
-            }
-        });
-
-        if (!response.ok) {
-            throw new Error(`Error del servidor: ${response.status}`);
-        }
-
-        // 3. Devolvemos el estado de juego que nos da el backend
-        // (que ahora SÍ coincide con la estructura esperada: { day, inventario, saldo, ... })
-        const savedState = await response.json();
-        console.log('[API]: ¡Éxito! Estado cargado desde backend.', savedState);
-        return savedState;
-
-    } catch (error) {
-        console.error('Error al cargar el estado del juego:', error);
-        // Lanzamos el error para que el 'useAuthStore' lo pueda capturar
-        throw error; 
-    }
+/**
+ * Avanza el día del mercado
+ * POST /api/mercado/avanzar-dia
+ */
+export const advanceMarketDay = async (payload) => {
+  try {
+    const response = await apiClient.post("/api/mercado/avanzar-dia", payload);
+    return response.data;
+  } catch (error) {
+    console.error("Error al avanzar día:", error);
+    return { success: false, message: "Error al avanzar el día" };
+  }
 };
