@@ -1,21 +1,21 @@
 # =====================================================
 # 🧠 Riqch'ariy Finanzas - Backend Principal
 # =====================================================
-from fastapi import FastAPI, Query
+from fastapi import FastAPI, Query, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, ValidationError
-from typing import List
+from typing import List, Optional
 import random
 import json
+from sqlalchemy.orm import Session
 
 # =====================================================
 # ⚙️ IMPORTS INTERNOS
 # =====================================================
 import models
-from database import engine
+from database import engine, get_db 
 from auth import router as auth_router
 from chatbot.router import router as chatbot_router
-# from market import router as market_router
 
 # =====================================================
 # ⚙️ CONFIGURACIÓN DE LA APP
@@ -42,14 +42,8 @@ app.add_middleware(
 # =====================================================
 models.Base.metadata.create_all(bind=engine)
 
-# 🔐 Autenticación (login / register)
-# CORRECCIÓN APLICADA: Se eliminó 'prefix="/auth"'
 app.include_router(auth_router, tags=["Auth"])
-
-# 🤖 Chatbot con IA
 app.include_router(chatbot_router, prefix="/chatbot", tags=["Chatbot"])
-
-# app.include_router(market_router, prefix="/market", tags=["Market"])
 
 # =====================================================
 # 📦 CONFIGURACIÓN DE PRODUCTOS
@@ -67,6 +61,9 @@ class Product(BaseModel):
     cost: float
     local_demand: str
     offer_stage: str
+    
+    class Config:
+        from_attributes = True
 
 class EstadoJuegoInput(BaseModel):
     dia_actual: int
@@ -74,8 +71,8 @@ class EstadoJuegoInput(BaseModel):
 
 class NuevoEstadoMercado(BaseModel):
     nuevo_dia: int
-    evento_regional: str | None
-    pedagogical_focus: str | None
+    evento_regional: Optional[str]
+    pedagogical_focus: Optional[str]
     products: List[Product]
 
 class InventarioItem(BaseModel):
@@ -85,13 +82,14 @@ class InventarioItem(BaseModel):
 class EstadoJuegoGuardado(BaseModel):
     day: int
     inventario: List[InventarioItem]
-    marketEvent: str | None
+    marketEvent: Optional[str]
     saldo: float
 
 class EstadoJuegoParaGuardar(BaseModel):
     saldo: float
     inventario: List[InventarioItem]
     day: int
+
 
 # =====================================================
 # 🧠 FUNCIONES AUXILIARES
@@ -122,14 +120,7 @@ def load_products_from_json() -> List[Product]:
         print(f"❌ Error inesperado → {e}")
         return []
 
-def filter_products_by_region(all_products: List[Product], region: str) -> List[Product]:
-    region_lower = region.lower()
-    return [
-        p for p in all_products
-        if p.region.lower() == region_lower or p.region.lower() == "global"
-    ]
-
-def calcular_motor_mercado(dia: int, productos: List[Product]) -> tuple[List[Product], str | None, str | None]:
+def calcular_motor_mercado(dia: int, productos: List[Product]) -> tuple[List[Product], Optional[str], Optional[str]]:
     """Genera la nueva simulación del mercado."""
     evento, foco_pedagogico = None, None
 
@@ -169,10 +160,44 @@ def calcular_motor_mercado(dia: int, productos: List[Product]) -> tuple[List[Pro
 
     return productos_actualizados, evento, foco_pedagogico
 
+
+def save_products_to_db(products: List[Product], db: Session):
+    """Guarda productos desde el JSON a la DB si no existen."""
+    for p in products:
+        if not db.query(models.ProductDB).filter(models.ProductDB.id == p.id).first():
+            db.add(models.ProductDB(
+                id=p.id,
+                name=p.name,
+                region=p.region,
+                price=p.price,
+                cost=p.cost,
+                local_demand=p.local_demand,
+                offer_stage=p.offer_stage
+            ))
+    db.commit()
+
+# =====================================================
+# 💡 EVENTO DE INICIO (CARGAR PRODUCTOS EN LA DB)
+# =====================================================
+@app.on_event("startup")
+def startup_event():
+    db = next(get_db())
+    initial_products_list = load_products_from_json()
+    save_products_to_db(initial_products_list, db)
+    db.close()
+    print("✅ Inserción de productos de inicio verificada.")
+
 # =====================================================
 # 🚀 ENDPOINTS DEL JUEGO Y MERCADO
 # =====================================================
-initial_products_list = load_products_from_json()
+
+@app.get("/products", response_model=List[Product])
+async def get_all_products(db: Session = Depends(get_db)) -> List[Product]:
+    """Devuelve todos los productos disponibles en la DB."""
+    db_products = db.query(models.ProductDB).all()
+    products_pydantic = [Product.model_validate(p) for p in db_products]
+    return products_pydantic
+
 
 @app.post("/api/mercado/avanzar-dia")
 async def avanzar_dia_mercado(estado_input: EstadoJuegoInput) -> NuevoEstadoMercado:
@@ -186,24 +211,35 @@ async def avanzar_dia_mercado(estado_input: EstadoJuegoInput) -> NuevoEstadoMerc
         products=productos_actualizados
     )
 
-@app.get("/api/productos/iniciales")
-async def obtener_productos_iniciales(region: str = Query(..., min_length=1)) -> List[Product]:
-    return filter_products_by_region(initial_products_list, region)
+@app.get("/api/productos/iniciales", response_model=List[Product])
+async def obtener_productos_iniciales(
+    region: str = Query(..., min_length=1),
+    db: Session = Depends(get_db)
+) -> List[Product]:
+    region_lower = region.lower()
+    db_products = db.query(models.ProductDB).filter(
+        (models.ProductDB.region.ilike(region_lower)) | (models.ProductDB.region.ilike("global"))
+    ).all()
+    products_pydantic = [Product.model_validate(p) for p in db_products]
+    return products_pydantic
+
 
 @app.get("/api/game/load", response_model=EstadoJuegoGuardado)
 async def cargar_partida_guardada(region: str = Query(..., min_length=1)) -> EstadoJuegoGuardado:
-    productos_filtrados = filter_products_by_region(load_products_from_json(), region)
+    productos_filtrados = load_products_from_json()
     inventario_simulado = []
-    if productos_filtrados:
-        producto = productos_filtrados[0].model_copy()
-        producto.price = 4.10
-        inventario_simulado.append(InventarioItem(product=producto, quantity=20))
+    
+    product_pydantic = Product.model_validate(productos_filtrados[0].model_dump())
+    product_pydantic.price = 4.10
+    inventario_simulado.append(InventarioItem(product=product_pydantic, quantity=20))
+    
     return EstadoJuegoGuardado(
         day=5,
         inventario=inventario_simulado,
         marketEvent="Sequía - Precios de bebidas altos",
         saldo=999.50
     )
+
 
 @app.post("/api/game/save")
 async def guardar_partida(estado: EstadoJuegoParaGuardar):
