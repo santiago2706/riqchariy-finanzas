@@ -187,6 +187,7 @@ def startup_event():
     db.close()
     print("✅ Inserción de productos de inicio verificada.")
 
+
 # =====================================================
 # 🚀 ENDPOINTS DEL JUEGO Y MERCADO
 # =====================================================
