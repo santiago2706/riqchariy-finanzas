@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Este es el nombre de nuestro servicio de base de datos
+  db:
+    # Le decimos a Docker que use la imagen oficial de PostgreSQL, versión 15
+    image: postgres:15
+    
+    # Esto asegura que la BD se reinicie si se cae
+    restart: always
+    
+    # Aquí definimos el usuario, contraseña y nombre de la BD
+    # ¡Importante! Estos deben coincidir con lo que pondrás en alembic.ini
+    environment:
+      POSTGRES_USER: kiosko_user
+      POSTGRES_PASSWORD: kiosko_pass
+      POSTGRES_DB: kiosko_db
+      
+    # Mapeamos el puerto de nuestra máquina al puerto del contenedor
+    # "5432:5432" -> "localhost:5432" apuntará a "contenedor:5432"
+    ports:
+      - "5432:5432"
+      
+    # Esto guarda los datos de tu BD en un "volumen"
+    # Así, aunque apagues o borres el contenedor, tus datos no se pierden
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+# Definimos el volumen que usamos arriba
+volumes:
+  postgres_data:

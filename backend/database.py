@@ -1,9 +1,12 @@
 # backend/database.py
 import os
+from dotenv import load_dotenv
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 
+
+load_dotenv()
 # 1️⃣ Obtener la URL de la base de datos
 DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./local.db")
 
