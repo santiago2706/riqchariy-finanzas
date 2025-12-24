@@ -1,20 +1,29 @@
 <script setup>
-// Importa todos los componentes necesarios para el layout
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 import AppHeader from '@/components/AppHeader.vue'
 import AppSidebar from '@/components/AppSidebar.vue'
 import MarketEventPopup from '@/components/MarketEventPopup.vue'
 import ChatbotWindow from '@/components/ChatbotWindow.vue'
 import { RouterView } from 'vue-router'
+
+const route = useRoute()
+
+// Vistas que usan el layout sin sidebar (diseño limpio)
+const hideSidebar = computed(() => 
+  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco'
+)
 </script>
 
 <template>
-  <div id="game-layout-container" class="min-h-screen bg-gray-100">
-
+  <div id="game-layout-container" :class="{ 'clean-mode': hideSidebar }">
     <AppHeader />
-    <AppSidebar />
+    
+    <!-- Sidebar solo visible cuando NO es dashboard ni lecciones -->
+    <AppSidebar v-if="!hideSidebar" />
 
-    <main class="pl-64 pt-16">
-      <div class="py-6 px-4 sm:px-6">
+    <main :class="hideSidebar ? 'main-clean' : 'main-with-sidebar'">
+      <div class="content-wrapper">
         <RouterView />
       </div>
     </main>
@@ -24,3 +33,33 @@ import { RouterView } from 'vue-router'
   </div>
 </template>
 
+<style scoped>
+#game-layout-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #FFF9F0 0%, #FFE8CC 50%, #E0F7F5 100%);
+}
+
+#game-layout-container.clean-mode {
+  background: linear-gradient(135deg, #FFF9F0 0%, #FFE8CC 50%, #E0F7F5 100%);
+}
+
+.main-with-sidebar {
+  padding-left: 256px; /* 64 * 4 = 256px (w-64) */
+  padding-top: 64px; /* Height of header */
+}
+
+.main-clean {
+  padding-top: 64px; /* Only header height, no sidebar */
+}
+
+.content-wrapper {
+  padding: 1.5rem;
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 768px) {
+  .main-with-sidebar {
+    padding-left: 0;
+  }
+}
+</style>
