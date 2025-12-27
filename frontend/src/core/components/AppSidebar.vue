@@ -1,6 +1,6 @@
 <script setup>
 import { RouterLink } from 'vue-router'
-import { useAuthStore } from '@/stores/useAuthStore'
+import { useAuthStore } from '@/modules/auth/store/useAuthStore'
 import { computed } from 'vue'
 
 const authStore = useAuthStore()
@@ -76,6 +76,9 @@ const userName = computed(() => authStore.user?.name || 'Invitado')
                 </RouterLink>
 
                 <template v-if="isColegioAdmin">
+                    <RouterLink :to="{ name: 'institution-dashboard' }" class="nav-link">
+                         <span class="truncate">🏫 Dashboard General</span>
+                    </RouterLink>
                     <RouterLink :to="{ name: 'estadisticas-colegio' }" class="nav-link">
                         <span class="truncate">📊 Estadísticas Institucionales</span>
                     </RouterLink>

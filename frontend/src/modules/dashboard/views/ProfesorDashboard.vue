@@ -1,9 +1,9 @@
 <script setup>
 import { ref, computed } from 'vue';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/modules/auth/store/useAuthStore';
 import { RouterLink } from 'vue-router';
 // Importamos el componente base (asumimos que lo nombramos BasePanel para evitar conflictos)
-import BasePanel from '@/components/BasePanel.vue';
+import BasePanel from '@/core/components/BasePanel.vue';
 
 const authStore = useAuthStore();
 const userRole = computed(() => authStore.user?.role || 'Colegio');
@@ -62,14 +62,45 @@ const handleEnviarReto = (alumnoNombre) => {
 <template>
     <div class="max-w-7xl mx-auto p-4 sm:p-6">
 
-        <div :class="userRole === 'Colegio' ? 'bg-indigo-800' : 'bg-green-700'" class="p-6 rounded-t-xl text-white shadow-xl">
-            <h1 class="text-3xl font-extrabold">
-                Panel de <span v-if="userRole === 'Colegio'">Administración Central</span>
-                <span v-else>Mi Aula Virtual</span>
-            </h1>
-            <p class="mt-1" :class="userRole === 'Colegio' ? 'text-indigo-200' : 'text-green-200'">
-                Bienvenido, {{ userName }}. Gestión y monitoreo del ecosistema Riqch'ariy.
-            </p>
+        <div :class="userRole === 'Colegio' ? 'bg-indigo-900' : 'bg-green-700'" class="p-6 rounded-t-xl text-white shadow-xl relative overflow-hidden">
+            <!-- Decorative Background Element -->
+            <div class="absolute top-0 right-0 -mt-4 -mr-4 w-32 h-32 rounded-full bg-white opacity-10 blur-xl"></div>
+
+            <div class="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center">
+                <div>
+                    <h1 class="text-3xl font-extrabold tracking-tight">
+                        <span v-if="userRole === 'Colegio'">I.E. Gran Unidad Escolar</span>
+                        <span v-else>Mi Aula Virtual</span>
+                    </h1>
+                    <p class="mt-2 text-sm font-medium opacity-90" :class="userRole === 'Colegio' ? 'text-indigo-200' : 'text-green-200'">
+                        <span v-if="userRole === 'Colegio'">
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-800 text-indigo-100 mr-2">
+                                📍 Región: Andes
+                            </span>
+                            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-800 text-indigo-100 mr-2">
+                                🌾 Contexto: Rural
+                            </span>
+                             Plan SaaS: <span class="text-yellow-400 font-bold">Premium ✨</span>
+                        </span>
+                        <span v-else>
+                            Bienvenido, {{ userName }}. Gestión del aula.
+                        </span>
+                    </p>
+                </div>
+                
+                <!-- Macro Metrics (Only for Colegio) -->
+                 <div v-if="userRole === 'Colegio'" class="mt-4 md:mt-0 flex space-x-4 bg-indigo-800 bg-opacity-50 p-3 rounded-lg border border-indigo-700">
+                    <div class="text-center">
+                        <p class="text-xs text-indigo-300 uppercase tracking-wider">Literacidad Financiera</p>
+                        <p class="text-2xl font-bold text-green-400">+15% <span class="text-xs text-white mobile-hidden">vs Nac.</span></p>
+                    </div>
+                     <div class="border-l border-indigo-600 mx-2"></div>
+                    <div class="text-center">
+                        <p class="text-xs text-indigo-300 uppercase tracking-wider">Engagement</p>
+                        <p class="text-2xl font-bold text-white">92%</p>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <BasePanel :border-class="userRole === 'Colegio' ? 'border-t-4 border-indigo-400' : 'border-t-4 border-green-400'" custom-class="rounded-t-none shadow-lg mb-8">

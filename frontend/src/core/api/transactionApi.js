@@ -1,7 +1,7 @@
 // src/services/transactionApi.js
 import apiClient from "./apiClient";
-import { useAuthStore } from "../stores/useAuthStore";
-import { useKioscoStore } from "../stores/useKioscoStore";
+import { useAuthStore } from "../../modules/auth/store/useAuthStore";
+import { useKioscoStore } from "../../modules/market/store/useKioscoStore";
 
 /**
  * Guarda el estado del juego en el backend

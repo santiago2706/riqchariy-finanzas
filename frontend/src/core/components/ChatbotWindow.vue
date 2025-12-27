@@ -1,8 +1,8 @@
 <script setup>
 import { ref, watch, nextTick, computed, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
-import { useChatbotStore } from '../stores/useChatbotStore';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useChatbotStore } from '@/stores/useChatbotStore';
+import { useAuthStore } from '@/modules/auth/store/useAuthStore';
 
 // 🚨 ARREGLO 1: Importamos la imagen de Pato. Usaremos 'PatoAvatarUrl' para diferenciar
 // que es la URL de la imagen que se usa en el template.

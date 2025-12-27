@@ -2,7 +2,7 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 // Importamos el store para asignar el nivel
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/modules/auth/store/useAuthStore';
 
 const router = useRouter();
 const authStore = useAuthStore();

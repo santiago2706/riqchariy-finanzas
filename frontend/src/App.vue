@@ -1,7 +1,7 @@
 <script setup>
 import { onMounted } from 'vue';
 import { RouterView } from 'vue-router';
-import { useAuthStore } from '@/stores/useAuthStore';
+import { useAuthStore } from '@/modules/auth/store/useAuthStore';
 
 // Obtenemos la instancia del store
 const authStore = useAuthStore();

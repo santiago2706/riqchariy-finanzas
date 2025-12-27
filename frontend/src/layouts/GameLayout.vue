@@ -1,17 +1,17 @@
 <script setup>
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
-import AppHeader from '@/components/AppHeader.vue'
-import AppSidebar from '@/components/AppSidebar.vue'
-import MarketEventPopup from '@/components/MarketEventPopup.vue'
-import ChatbotWindow from '@/components/ChatbotWindow.vue'
+import AppHeader from '@/core/components/AppHeader.vue'
+import AppSidebar from '@/core/components/AppSidebar.vue'
+import MarketEventPopup from '@/modules/market/components/MarketEventPopup.vue'
+import ChatbotWindow from '@/core/components/ChatbotWindow.vue'
 import { RouterView } from 'vue-router'
 
 const route = useRoute()
 
 // Vistas que usan el layout sin sidebar (diseño limpio)
 const hideSidebar = computed(() => 
-  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco'
+  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco' || route.name === 'presupuesto-brote'
 )
 </script>
 

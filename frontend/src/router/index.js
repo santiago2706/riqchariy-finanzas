@@ -3,26 +3,38 @@ import { createRouter, createWebHistory } from 'vue-router';
 import GameLayout from '@/layouts/GameLayout.vue';
 import PublicLayout from '@/layouts/PublicLayout.vue';
 
-// Vistas públicas
-import HomeView from '@/views/HomeView.vue';
-import LoginView from '@/views/LoginView.vue';
-import RegisterView from '@/views/RegisterView.vue';
+// --- Imports de Módulos (DDD) ---
 
-// Vistas del juego
-import DashboardView from '@/views/DashboardView.vue';
-import KioscoView from '@/views/KioscoView.vue';
-import DiagnosticoView from '@/views/DiagnosticoView.vue';
-import SemillaView from '@/views/SemillaView.vue';
-import PresupuestoView from '@/views/PresupuestoView.vue';
-import LeccionesView from '@/views/LeccionesView.vue';
+// Landing
+import HomeView from '@/modules/landing/views/HomeView.vue';
 
-// Vistas de gestión
-import AvanceAlumnoView from '@/views/AvanceAlumnoView.vue';
-import ProfesorDashboard from '@/views/ProfesorDashboard.vue';
-import RetosView from '@/views/RetosView.vue';
-import EstadisticasView from '@/views/EstadisticasView.vue';
+// Auth
+import LoginView from '@/modules/auth/views/LoginView.vue';
+import RegisterView from '@/modules/auth/views/RegisterView.vue';
 
-import { useAuthStore } from '@/stores/useAuthStore.js';
+// Dashboard
+import DashboardView from '@/modules/dashboard/views/DashboardView.vue';
+import ProfesorDashboard from '@/modules/dashboard/views/ProfesorDashboard.vue';
+import AvanceAlumnoView from '@/modules/dashboard/views/AvanceAlumnoView.vue';
+import EstadisticasView from '@/modules/dashboard/views/EstadisticasView.vue';
+
+// Institution (Colegio/SaaS)
+import InstitutionDashboard from '@/modules/institution/views/InstitutionDashboard.vue';
+
+// Market (Tiendita)
+import KioscoView from '@/modules/market/views/KioscoView.vue';
+
+// Learning (Lecciones)
+import DiagnosticoView from '@/modules/learning/views/DiagnosticoView.vue';
+import SemillaView from '@/modules/learning/views/SemillaView.vue';
+import LeccionesView from '@/modules/learning/views/LeccionesView.vue';
+import RetosView from '@/modules/learning/views/RetosView.vue';
+
+// Budgeting (Presupuesto)
+import PresupuestoView from '@/modules/budgeting/views/PresupuestoView.vue';
+
+// Store
+import { useAuthStore } from '@/modules/auth/store/useAuthStore.js';
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -52,6 +64,9 @@ const router = createRouter({
       meta: { requiresAuth: true },
       children: [
         { path: 'dashboard', name: 'dashboard', component: DashboardView },
+        // Institution Route
+        { path: 'institution', name: 'institution-dashboard', component: InstitutionDashboard },
+
         { path: 'kiosco', name: 'kiosco', component: KioscoView },
         { path: 'diagnostico', name: 'diagnostico', component: DiagnosticoView },
         { path: 'lecciones', name: 'lecciones', component: LeccionesView },
@@ -86,7 +101,8 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'login' });
   } else if (requiresGuest && isAuthenticated) {
     if (auth.user?.role === 'Estudiante') next({ name: 'dashboard' });
-    else if (auth.user?.role === 'Profesor' || auth.user?.role === 'Colegio') next({ name: 'profesor-dashboard' });
+    else if (auth.user?.role === 'Profesor') next({ name: 'profesor-dashboard' });
+    else if (auth.user?.role === 'Colegio') next({ name: 'institution-dashboard' });
     else next({ name: 'dashboard' });
   } else if (isAuthenticated && auth.user?.role === 'Estudiante' && !auth.user.level) {
     // ⚙️ Redirección controlada a diagnóstico si aún no tiene nivel
