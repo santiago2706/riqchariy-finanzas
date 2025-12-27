@@ -11,7 +11,7 @@ const route = useRoute()
 
 // Vistas que usan el layout sin sidebar (diseño limpio)
 const hideSidebar = computed(() => 
-  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco' || route.name === 'presupuesto-brote'
+  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco' || route.name === 'presupuesto-brote' || route.name === 'perfil'
 )
 </script>
 

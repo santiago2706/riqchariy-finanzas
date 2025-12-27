@@ -33,6 +33,9 @@ import RetosView from '@/modules/learning/views/RetosView.vue';
 // Budgeting (Presupuesto)
 import PresupuestoView from '@/modules/budgeting/views/PresupuestoView.vue';
 
+// Profile
+import ProfileView from '@/modules/auth/views/ProfileView.vue';
+
 // Store
 import { useAuthStore } from '@/modules/auth/store/useAuthStore.js';
 
@@ -76,6 +79,7 @@ const router = createRouter({
         { path: 'avance/:id', name: 'avance-alumno', component: AvanceAlumnoView },
         { path: 'retos-gestion', name: 'retos-gestion', component: RetosView },
         { path: 'estadisticas', name: 'estadisticas-colegio', component: EstadisticasView },
+        { path: 'perfil', name: 'perfil', component: ProfileView },
       ]
     },
 
