@@ -1,5 +1,5 @@
 // src/services/marketApi.js
-import apiClient from "./apiClient";
+import apiClient from "@/core/api/apiClient";
 
 /**
  * Obtiene los precios actualizados y eventos del mercado

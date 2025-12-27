@@ -2,7 +2,7 @@
 import { computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 // 1. IMPORTAMOS EL 'CEREBRO'
-import { useKioscoStore } from '@/stores/useKioscoStore'
+import { useKioscoStore } from '@/modules/market/store/useKioscoStore'
 
 // 2. CONECTAMOS EL 'CEREBRO' (Tu lógica era correcta)
 const kioscoStore = useKioscoStore()

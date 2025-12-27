@@ -3,7 +3,7 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 // Usaremos la importación del primer bloque, asumiendo que es la más precisa
-import { fetchBotResponse } from '../services/chatbotApi.js';
+import { fetchBotResponse } from '../core/api/chatbotApi.js';
 
 // Generador simple de ID para mensajes
 let messageId = 0;

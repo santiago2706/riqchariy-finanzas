@@ -1,5 +1,5 @@
 // src/services/authApi.js
-import apiClient from "./apiClient";
+import apiClient from "@/core/api/apiClient";
 
 // login (body JSON)
 export const login = async (email, password) => {

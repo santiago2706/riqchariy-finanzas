@@ -123,8 +123,8 @@
 <script setup>
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/useAuthStore'
-import { useKioscoStore } from '@/stores/useKioscoStore'
+import { useAuthStore } from '@/modules/auth/store/useAuthStore'
+import { useKioscoStore } from '@/modules/market/store/useKioscoStore'
 
 const router = useRouter()
 const auth = useAuthStore()

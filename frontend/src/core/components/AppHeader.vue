@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed } from 'vue'
-import { useAuthStore } from '@/stores/useAuthStore'
-import { useKioscoStore } from '@/stores/useKioscoStore'
+import { useAuthStore } from '@/modules/auth/store/useAuthStore'
+import { useKioscoStore } from '@/modules/market/store/useKioscoStore'
 
 const auth = useAuthStore()
 const kiosco = useKioscoStore()

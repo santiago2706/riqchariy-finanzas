@@ -2,9 +2,9 @@
 import { ref } from 'vue';
 import { defineStore } from 'pinia';
 import { login as apiLogin, register as apiRegister } from '../services/authApi.js';
-import router from '../router/index.js';
-import { useKioscoStore } from './useKioscoStore';
-import { fetchGameState } from '../services/transactionApi.js';
+import router from '@/router/index.js';
+import { useKioscoStore } from '@/modules/market/store/useKioscoStore';
+import { fetchGameState } from '@/core/api/transactionApi.js';
 
 export const useAuthStore = defineStore('auth', () => {
     // =====================================================
@@ -74,7 +74,9 @@ export const useAuthStore = defineStore('auth', () => {
                 // --- Redirección por rol ---
                 if (user.value.role === 'Estudiante') {
                     router.push({ name: user.value.level ? 'dashboard' : 'diagnostico' });
-                } else if (user.value.role === 'Profesor' || user.value.role === 'Colegio') {
+                } else if (user.value.role === 'Colegio') {
+                    router.push({ name: 'institution-dashboard' });
+                } else if (user.value.role === 'Profesor') {
                     router.push({ name: 'profesor-dashboard' });
                 } else {
                     router.push({ name: 'dashboard' });

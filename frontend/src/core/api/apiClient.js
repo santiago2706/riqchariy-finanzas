@@ -1,6 +1,6 @@
 // src/services/apiClient.js
 import axios from "axios";
-import { API_URL } from "../config/api"; // ✅ Usa la ruta relativa correcta
+import { API_URL } from "../../config/api"; // ✅ Usa la ruta relativa correcta
 
 const apiClient = axios.create({
   baseURL: API_URL,

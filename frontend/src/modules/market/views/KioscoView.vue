@@ -1,8 +1,8 @@
 <script setup>
 import { onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { useKioscoStore } from '../stores/useKioscoStore';
-import { useMarketStore } from '../stores/useMarketStore';
+import { useKioscoStore } from '../store/useKioscoStore';
+import { useMarketStore } from '../store/useMarketStore';
 import ProductCard from '../components/ProductCard.vue';
 
 const router = useRouter();
