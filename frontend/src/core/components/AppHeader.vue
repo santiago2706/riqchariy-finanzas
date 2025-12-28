@@ -1,8 +1,10 @@
 <script setup>
 import { ref, computed } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/modules/auth/store/useAuthStore'
 import { useKioscoStore } from '@/modules/market/store/useKioscoStore'
 
+const router = useRouter()
 const auth = useAuthStore()
 const kiosco = useKioscoStore()
 
@@ -18,6 +20,11 @@ function toggleDropdown() {
 
 function closeDropdown() {
   isDropdownOpen.value = false
+}
+
+function navigateTo(routeName) {
+  closeDropdown()
+  router.push({ name: routeName })
 }
 
 function handleLogout() {
@@ -59,12 +66,12 @@ function handleLogout() {
               <div class="dropdown-header-role">Estudiante - {{ userLevel }}</div>
             </div>
 
-            <a href="#" class="dropdown-item" @click="closeDropdown">
+            <a href="#" class="dropdown-item" @click.prevent="navigateTo('perfil')">
               <span class="dropdown-item-icon">👤</span>
               <span class="dropdown-item-text">Mi Perfil</span>
             </a>
 
-            <a href="#" class="dropdown-item" @click="closeDropdown">
+            <a href="#" class="dropdown-item" @click.prevent="navigateTo('configuracion')">
               <span class="dropdown-item-icon">⚙️</span>
               <span class="dropdown-item-text">Configuración</span>
             </a>
