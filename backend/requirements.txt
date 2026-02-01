@@ -1,29 +1,56 @@
-annotated-doc==0.0.3
-annotated-types==0.7.0
-anyio==4.11.0
-bcrypt==5.0.0
-click==8.3.0
-colorama==0.4.6
-fastapi==0.121.1
-greenlet==3.2.4
-h11==0.16.0
-httptools==0.7.1
-idna==3.11
-psycopg2==2.9.11
-psycopg2-binary==2.9.11
-pydantic==2.12.4
-pydantic-settings==2.11.0
-pydantic_core==2.41.5
-python-dotenv==1.2.1
-PyYAML==6.0.3
-sniffio==1.3.1
-SQLAlchemy==2.0.44
-sqlmodel==0.0.27
-starlette==0.49.3
-typing-inspection==0.4.2
-typing_extensions==4.15.0
-uvicorn==0.38.0
-watchfiles==1.1.1
-websockets==15.0.1
-psycopg2-binary
-python-dotenv
+# ==============================================================================
+# DEPENDENCIAS DEL PROYECTO - RIQCHARIY FINANZAS BACKEND
+# ==============================================================================
+# Este archivo lista todas las dependencias Python necesarias para el backend.
+# 
+# Para instalar todas las dependencias:
+#   pip install -r requirements.txt
+#
+# Para agregar nuevas dependencias:
+#   1. Instalar con: pip install <nombre-paquete>
+#   2. Agregar a este archivo con la versión específica
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# FRAMEWORK WEB
+# ------------------------------------------------------------------------------
+fastapi>=0.109.0           # Framework web asíncrono de alto rendimiento
+uvicorn[standard]>=0.27.0  # Servidor ASGI para ejecutar FastAPI
+
+# ------------------------------------------------------------------------------
+# VALIDACIÓN Y CONFIGURACIÓN
+# ------------------------------------------------------------------------------
+pydantic>=2.5.0            # Validación de datos y serialización
+pydantic-settings>=2.1.0   # Manejo de configuración desde .env
+python-dotenv>=1.0.0       # Carga de variables de entorno desde .env
+
+# ------------------------------------------------------------------------------
+# AUTENTICACIÓN Y SEGURIDAD
+# ------------------------------------------------------------------------------
+python-jose[cryptography]>=3.3.0  # Manejo de tokens JWT
+passlib[bcrypt]>=1.7.4            # Hashing seguro de contraseñas
+python-multipart>=0.0.6           # Soporte para form-data (login)
+
+# ------------------------------------------------------------------------------
+# CLIENTE HTTP (Para integraciones externas)
+# ------------------------------------------------------------------------------
+httpx>=0.26.0              # Cliente HTTP asíncrono (para llamadas a APIs externas)
+
+# ------------------------------------------------------------------------------
+# UTILIDADES
+# ------------------------------------------------------------------------------
+email-validator>=2.1.0     # Validación de emails en schemas
+
+# ------------------------------------------------------------------------------
+# TESTING (Descomentar cuando se necesiten pruebas)
+# ------------------------------------------------------------------------------
+# pytest>=7.4.0            # Framework de testing
+# pytest-asyncio>=0.23.0   # Soporte async para pytest
+# httpx>=0.26.0            # Cliente HTTP para tests
+
+# ------------------------------------------------------------------------------
+# BASE DE DATOS (Descomentar cuando se configure la BD)
+# ------------------------------------------------------------------------------
+# sqlalchemy>=2.0.25       # ORM para base de datos
+# asyncpg>=0.29.0          # Driver async para PostgreSQL
+# alembic>=1.13.0          # Migraciones de base de datos
