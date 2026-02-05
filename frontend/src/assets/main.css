@@ -1,89 +1,981 @@
 @import "tailwindcss";
 
 /* barra gradiente tipo “hero” */
-.hero-bar{
-  @apply rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-teal-300
-         px-6 py-3 backdrop-blur-md
-         ring-1 ring-white/10
-         shadow-[0_14px_36px_-14px_rgba(0,0,0,0.45)];
+.hero-bar {
+  @apply rounded-2xl bg-gradient-to-r from-rose-400 via-amber-300 to-teal-300 px-6 py-3 backdrop-blur-md ring-1 ring-white/10;
+  box-shadow: 0 14px 36px -14px rgba(0, 0, 0, 0.45);
 }
+
 /* enlaces del menú */
-.nav-link{
+.nav-link {
   @apply text-white/95 font-semibold tracking-wide drop-shadow hover:opacity-90;
 }
+
 /* botón contorno blanco (Iniciar sesión) */
-.btn-ghost{
-  @apply px-6 py-2 rounded-full border border-white/85 text-white
-         bg-white/10 hover:bg-white/20 transition shadow-[inset_0_0_0_1px_rgba(255,255,255,.25)];
+.btn-ghost {
+  @apply px-6 py-2 rounded-full border border-white/85 text-white bg-white/10 hover:bg-white/20 transition;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.25);
 }
+
 /* botón gradiente (Registrarse) */
-.btn-primary{
-  @apply px-6 py-2 rounded-full font-bold text-white
-         bg-gradient-to-r from-rose-500 to-orange-400
-         shadow-lg hover:shadow-xl;
+.btn-primary {
+  @apply px-6 py-2 rounded-full font-bold text-white bg-gradient-to-r from-rose-500 to-orange-400 shadow-lg hover:shadow-xl;
 }
+
 /* icono semilla con leve balanceo */
-@keyframes sway{0%,100%{transform:rotate(0)}50%{transform:rotate(45deg)}}
-.plant-sway{animation:sway 2.8s ease-in-out infinite;}
+@keyframes sway {
+
+  0%,
+  100% {
+    transform: rotate(0)
+  }
+
+  50% {
+    transform: rotate(45deg)
+  }
+}
+
+.plant-sway {
+  animation: sway 2.8s ease-in-out infinite;
+}
 
 /* Utilidades personalizadas para tu look */
 @layer utilities {
-  .grad-footer{background:linear-gradient(180deg,#2F4154 0%,#101827 100%);} /* azul pedido */
-  .footer-divider{border-top:1px solid rgba(255,255,255,.08);}
-  .glow-seed{box-shadow:0 0 0 6px rgba(255,223,0,.12),0 12px 40px rgba(255,223,0,.35);}
-  .grad-hero{
-    background-image: linear-gradient(135deg,#FF6B6B 0%,#FFE66D 50%,#4ECDC4 100%);
-    box-shadow: 0 8px 24px rgba(0,0,0,.12);
-    border-bottom-left-radius: 16px; /* leve curva como en html */
+  .grad-footer {
+    background: linear-gradient(180deg, #2F4154 0%, #101827 100%);
+  }
+
+  /* azul pedido */
+  .footer-divider {
+    border-top: 1px solid rgba(255, 255, 255, .08);
+  }
+
+  .glow-seed {
+    box-shadow: 0 0 0 6px rgba(255, 223, 0, .12), 0 12px 40px rgba(255, 223, 0, .35);
+  }
+
+  .grad-hero {
+    background-image: linear-gradient(135deg, #FF6B6B 0%, #FFE66D 50%, #4ECDC4 100%);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, .12);
+    border-bottom-left-radius: 16px;
+    /* leve curva como en html */
     border-bottom-right-radius: 16px;
   }
-  .grad-pill{
-    background-image: linear-gradient(135deg,#FF6B6B 0%,#FF8E53 100%);
+
+  .grad-pill {
+    background-image: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
   }
-  .animate-header-glow{ animation: headerGlow 3s ease-in-out infinite; }
-  .animate-bounce-soft{ animation: bounceSoft 2s ease-in-out infinite; }
+
+  .animate-header-glow {
+    animation: headerGlow 3s ease-in-out infinite;
+  }
+
+  .animate-bounce-soft {
+    animation: bounceSoft 2s ease-in-out infinite;
+  }
 
   /* Tarjeta con borde-degradado y vidrio suave */
-  .card-glass{
-    background: linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.92));
+  .card-glass {
+    background: linear-gradient(180deg, rgba(255, 255, 255, .96), rgba(255, 255, 255, .92));
     backdrop-filter: blur(6px);
-    box-shadow: 0 24px 60px rgba(0,0,0,.20);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, .20);
   }
-  .border-gradient{ position:relative; }
-  .border-gradient::before{
-    content:""; position:absolute; inset:-2px; z-index:-1; border-radius: inherit;
-    background: linear-gradient(45deg,#FF6B6B,#4ECDC4,#FFE66D,#FF6B6B);
-    background-size: 300% 300%; animation: borderFlow 6s linear infinite;
+
+  .border-gradient {
+    position: relative;
+  }
+
+  .border-gradient::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(45deg, #FF6B6B, #4ECDC4, #FFE66D, #FF6B6B);
+    background-size: 300% 300%;
+    animation: borderFlow 6s linear infinite;
   }
 
   /* Botón degradado del login */
-  .btn-login-grad{
-    background-image: linear-gradient(135deg,#FF6B6B 0%,#4ECDC4 60%,#22D3EE 100%);
-    box-shadow: 0 8px 20px rgba(34,211,238,.25);
+  .btn-login-grad {
+    background-image: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 60%, #22D3EE 100%);
+    box-shadow: 0 8px 20px rgba(34, 211, 238, .25);
   }
-  .btn-login-grad:hover{ filter:brightness(1.05); }
 
-  @keyframes sway{
-    0%,100%{transform:rotate(0deg); }
-    50%{transform:translateY(-2px) rotate(20deg); }
+  .btn-login-grad:hover {
+    filter: brightness(1.05);
   }
-  .animate-sway{
-    animation:sway 2.2s ease-in-out infinite}
+
+  @keyframes sway {
+
+    0%,
+    100% {
+      transform: rotate(0deg);
+    }
+
+    50% {
+      transform: translateY(-2px) rotate(20deg);
+    }
+  }
+
+  .animate-sway {
+    animation: sway 2.2s ease-in-out infinite
+  }
 
   /* tipografías y colores del footer */
-  .footer-title{ @apply text-white font-extrabold text-[clamp(1.6rem,3vw,2.3rem)] }
-  .footer-sub{ @apply text-slate-200/80 text-[clamp(1rem,2.2vw,1.25rem)] }
-  .footer-link{ @apply text-slate-200 hover:text-white transition }
+  .footer-title {
+    color: white;
+    font-weight: 800;
+    font-size: clamp(1.6rem, 3vw, 2.3rem);
+  }
+
+  .footer-sub {
+    color: rgba(226, 232, 240, 0.8);
+    font-size: clamp(1rem, 2.2vw, 1.25rem);
+  }
+
+  .footer-link {
+    @apply text-slate-200 hover:text-white transition
+  }
 }
 
-@keyframes headerGlow{
-  0%,100%{ box-shadow:0 8px 28px rgba(255,107,107,.25); }
-  50%{ box-shadow:0 8px 28px rgba(78,205,196,.35); }
-}
-@keyframes bounceSoft{ 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
-@keyframes borderFlow{
-  0%{ background-position:0% 50% }
-  50%{ background-position:100% 50% }
-  100%{ background-position:0% 50% }
+@keyframes headerGlow {
+
+  0%,
+  100% {
+    box-shadow: 0 8px 28px rgba(255, 107, 107, .25);
+  }
+
+  50% {
+    box-shadow: 0 8px 28px rgba(78, 205, 196, .35);
+  }
 }
 
+@keyframes bounceSoft {
+
+  0%,
+  100% {
+    transform: translateY(0)
+  }
+
+  50% {
+    transform: translateY(-3px)
+  }
+}
+
+@keyframes borderFlow {
+  0% {
+    background-position: 0% 50%
+  }
+
+  50% {
+    background-position: 100% 50%
+  }
+
+  100% {
+    background-position: 0% 50%
+  }
+}
+
+/* ============================================
+   DARK MODE STYLES - COMPLETE PLATFORM
+   ============================================ */
+
+/* Dark mode CSS Variables */
+.dark-mode {
+  --bg-primary: #0f172a;
+  --bg-secondary: #1e293b;
+  --bg-card: #1e293b;
+  --bg-input: #334155;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --border-color: #334155;
+  --border-light: #475569;
+  --accent-gradient: linear-gradient(135deg, #FF6B6B 0%, #4ECDC4 100%);
+}
+
+/* ========== BASE ELEMENTS ========== */
+.dark-mode,
+.dark-mode body,
+.dark-mode html {
+  background-color: #0f172a !important;
+  color: #f1f5f9 !important;
+}
+
+/* Main Layout Container */
+.dark-mode #game-layout-container,
+.dark-mode #app,
+.dark-mode .game-layout {
+  background: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #0f172a 100%) !important;
+}
+
+.dark-mode .main-clean,
+.dark-mode .main-with-sidebar,
+.dark-mode .content-wrapper {
+  background: transparent !important;
+}
+
+/* ========== HEADER ========== */
+.dark-mode .app-header {
+  background: linear-gradient(135deg, #7c3aed 0%, #2563eb 50%, #0891b2 100%) !important;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark-mode .coins-display {
+  background: rgba(0, 0, 0, 0.3) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark-mode .user-profile {
+  background: rgba(0, 0, 0, 0.2) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark-mode .user-profile:hover,
+.dark-mode .user-profile.active {
+  background: rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Dropdown Menu */
+.dark-mode .dropdown-menu {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark-mode .dropdown-header {
+  background: linear-gradient(135deg, #7c3aed 0%, #0891b2 100%) !important;
+}
+
+.dark-mode .dropdown-item {
+  color: #e2e8f0 !important;
+  background: #1e293b !important;
+  border-bottom-color: #334155 !important;
+}
+
+.dark-mode .dropdown-item:hover {
+  background: #334155 !important;
+}
+
+.dark-mode .dropdown-item.logout:hover {
+  background: rgba(239, 68, 68, 0.2) !important;
+}
+
+/* ========== SIDEBAR ========== */
+.dark-mode .sidebar,
+.dark-mode .app-sidebar {
+  background: linear-gradient(180deg, #1e293b 0%, #0f172a 100%) !important;
+  border-right: 1px solid #334155 !important;
+}
+
+.dark-mode .sidebar-section-title {
+  color: #64748b !important;
+}
+
+.dark-mode .sidebar-link,
+.dark-mode .nav-item {
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .sidebar-link:hover,
+.dark-mode .nav-item:hover {
+  background: rgba(255, 255, 255, 0.05) !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .sidebar-link.active,
+.dark-mode .nav-item.active {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.3), rgba(8, 145, 178, 0.3)) !important;
+  color: #f1f5f9 !important;
+}
+
+/* ========== ALL CARDS ========== */
+.dark-mode .card,
+.dark-mode .game-card,
+.dark-mode .module-card,
+.dark-mode .dashboard-card,
+.dark-mode .settings-card,
+.dark-mode .settings-header,
+.dark-mode .info-card,
+.dark-mode .progress-card,
+.dark-mode .stat-card,
+.dark-mode .profile-header,
+.dark-mode .kiosco-card,
+.dark-mode .product-card,
+.dark-mode .product-item,
+.dark-mode .topics-card,
+.dark-mode .document-card,
+.dark-mode .tutor-card,
+.dark-mode .topic-item,
+.dark-mode .lesson-card,
+.dark-mode .achievement-card,
+.dark-mode .cost-card,
+.dark-mode .goal-card,
+.dark-mode .profit-card,
+.dark-mode .budget-card,
+.dark-mode .kpi-card,
+.dark-mode .stats-card,
+.dark-mode .welcome-card,
+.dark-mode .action-card,
+.dark-mode .quiz-card,
+.dark-mode .reward-card,
+.dark-mode .category-card,
+.dark-mode .item-card {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f1f5f9 !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .card:hover,
+.dark-mode .game-card:hover,
+.dark-mode .module-card:hover,
+.dark-mode .product-card:hover {
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.4) !important;
+  border-color: #475569 !important;
+}
+
+/* ========== DASHBOARD SPECIFIC ========== */
+.dark-mode .dashboard-container,
+.dark-mode .dashboard-content,
+.dark-mode .profile-container,
+.dark-mode .settings-container,
+.dark-mode .kiosco-container,
+.dark-mode .lecciones-container,
+.dark-mode .presupuesto-container {
+  background: transparent !important;
+}
+
+.dark-mode .welcome-section,
+.dark-mode .welcome-banner,
+.dark-mode .hero-section {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  border: 1px solid #334155 !important;
+}
+
+.dark-mode .stats-grid>div,
+.dark-mode .kpi-panel,
+.dark-mode .summary-panel {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+/* ========== TEXT COLORS ========== */
+.dark-mode h1,
+.dark-mode h2,
+.dark-mode h3,
+.dark-mode h4,
+.dark-mode h5,
+.dark-mode h6,
+.dark-mode .title,
+.dark-mode .card-title,
+.dark-mode .section-title {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode p,
+.dark-mode span,
+.dark-mode label,
+.dark-mode .description,
+.dark-mode .subtitle,
+.dark-mode .text-muted {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .header-text h1,
+.dark-mode .settings-card h2,
+.dark-mode .setting-label,
+.dark-mode .info-label,
+.dark-mode .stat-value,
+.dark-mode .card-value,
+.dark-mode .amount {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .header-text p,
+.dark-mode .setting-value,
+.dark-mode .setting-desc,
+.dark-mode .info-value,
+.dark-mode .stat-label,
+.dark-mode .card-label {
+  color: #94a3b8 !important;
+}
+
+/* ========== FORM ELEMENTS ========== */
+.dark-mode input,
+.dark-mode textarea,
+.dark-mode select {
+  background: #334155 !important;
+  border: 1px solid #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode input::placeholder,
+.dark-mode textarea::placeholder {
+  color: #64748b !important;
+}
+
+.dark-mode input:focus,
+.dark-mode textarea:focus,
+.dark-mode select:focus {
+  border-color: #7c3aed !important;
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2) !important;
+}
+
+/* Setting items and list items */
+.dark-mode .setting-item,
+.dark-mode .info-item,
+.dark-mode .list-item,
+.dark-mode .menu-item {
+  background: #334155 !important;
+  border: 1px solid #475569 !important;
+}
+
+.dark-mode .setting-item:hover,
+.dark-mode .info-item:hover,
+.dark-mode .list-item:hover {
+  background: #475569 !important;
+}
+
+/* ========== BUTTONS ========== */
+.dark-mode .btn,
+.dark-mode button:not(.toggle-switch):not([class*="gradient"]) {
+  border-color: #475569 !important;
+}
+
+.dark-mode .btn-secondary,
+.dark-mode .edit-btn:disabled {
+  background: #475569 !important;
+  color: #94a3b8 !important;
+}
+
+/* ========== LINKS ========== */
+.dark-mode a:not([class*="btn"]):not(.dropdown-item):not(.router-link) {
+  color: #7dd3fc !important;
+}
+
+.dark-mode .link-item {
+  color: #e2e8f0 !important;
+}
+
+.dark-mode .link-item:hover {
+  background: linear-gradient(to right, #334155, #475569) !important;
+}
+
+/* ========== PROGRESS BARS ========== */
+.dark-mode .progress-bar,
+.dark-mode .progress-track {
+  background: #334155 !important;
+}
+
+/* ========== BADGES & TAGS ========== */
+.dark-mode .badge,
+.dark-mode .tag,
+.dark-mode .chip {
+  border: 1px solid #475569 !important;
+}
+
+/* ========== ACHIEVEMENT ITEMS ========== */
+.dark-mode .achievement-item,
+.dark-mode .achievement-badge {
+  background: linear-gradient(135deg, #334155, #475569) !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #475569 !important;
+}
+
+/* ========== TOGGLE SWITCH ========== */
+.dark-mode .slider {
+  background-color: #475569 !important;
+}
+
+.dark-mode input:checked+.slider {
+  background: linear-gradient(135deg, #4ECDC4 0%, #38EF7D 100%) !important;
+}
+
+/* ========== TABLES ========== */
+.dark-mode table,
+.dark-mode .table {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+}
+
+.dark-mode th {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+  border-color: #475569 !important;
+}
+
+.dark-mode td {
+  background: #1e293b !important;
+  color: #e2e8f0 !important;
+  border-color: #334155 !important;
+}
+
+.dark-mode tr:hover td {
+  background: #334155 !important;
+}
+
+/* ========== MODALS & POPUPS ========== */
+.dark-mode .modal,
+.dark-mode .popup,
+.dark-mode .dialog,
+.dark-mode .modal-content,
+.dark-mode .popup-content {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .modal-header,
+.dark-mode .popup-header {
+  border-bottom-color: #334155 !important;
+}
+
+.dark-mode .modal-footer,
+.dark-mode .popup-footer {
+  border-top-color: #334155 !important;
+}
+
+/* Modal overlay */
+.dark-mode .modal-overlay,
+.dark-mode .popup-overlay {
+  background: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* ========== KIOSCO / TIENDITA ========== */
+.dark-mode .store-header,
+.dark-mode .kiosco-header,
+.dark-mode .shop-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+}
+
+.dark-mode .product-grid,
+.dark-mode .items-grid {
+  background: transparent !important;
+}
+
+.dark-mode .price-tag,
+.dark-mode .coin-price {
+  background: rgba(255, 193, 7, 0.2) !important;
+  border: 1px solid rgba(255, 193, 7, 0.4) !important;
+}
+
+.dark-mode .inventory-panel,
+.dark-mode .cart-panel {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+/* ========== LECCIONES ========== */
+.dark-mode .lesson-header,
+.dark-mode .chapter-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+}
+
+.dark-mode .lesson-content,
+.dark-mode .chapter-content {
+  background: #1e293b !important;
+}
+
+.dark-mode .lesson-item,
+.dark-mode .chapter-item {
+  background: #334155 !important;
+  border: 1px solid #475569 !important;
+}
+
+.dark-mode .lesson-item:hover,
+.dark-mode .chapter-item:hover {
+  background: #475569 !important;
+}
+
+/* ========== PRESUPUESTO ========== */
+.dark-mode .budget-header,
+.dark-mode .presupuesto-header {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+}
+
+.dark-mode .expense-item,
+.dark-mode .income-item,
+.dark-mode .transaction-item {
+  background: #334155 !important;
+  border: 1px solid #475569 !important;
+}
+
+.dark-mode .budget-summary,
+.dark-mode .balance-panel {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+/* ========== NOTIFICATIONS & ALERTS ========== */
+.dark-mode .notification,
+.dark-mode .alert,
+.dark-mode .toast {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .notification.success,
+.dark-mode .alert.success {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border-color: rgba(34, 197, 94, 0.4) !important;
+}
+
+.dark-mode .notification.error,
+.dark-mode .alert.error {
+  background: rgba(239, 68, 68, 0.2) !important;
+  border-color: rgba(239, 68, 68, 0.4) !important;
+}
+
+.dark-mode .notification.warning,
+.dark-mode .alert.warning {
+  background: rgba(245, 158, 11, 0.2) !important;
+  border-color: rgba(245, 158, 11, 0.4) !important;
+}
+
+/* ========== CHATBOT ========== */
+.dark-mode .chatbot-window,
+.dark-mode .chat-container {
+  background: #1e293b !important;
+  border: 1px solid #334155 !important;
+}
+
+.dark-mode .chat-message,
+.dark-mode .message-bubble {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .chat-input {
+  background: #334155 !important;
+  border-top: 1px solid #475569 !important;
+}
+
+/* ========== SCROLLBARS ========== */
+.dark-mode ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.dark-mode ::-webkit-scrollbar-track {
+  background: #1e293b;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+.dark-mode ::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
+
+/* ========== APP INFO FOOTER ========== */
+.dark-mode .app-info,
+.dark-mode .footer-info {
+  color: #64748b !important;
+}
+
+/* ========== TOOLTIPS ========== */
+.dark-mode .tooltip,
+.dark-mode [data-tooltip]::after {
+  background: #334155 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #475569 !important;
+}
+
+/* ========== LOADING STATES ========== */
+.dark-mode .skeleton,
+.dark-mode .loading-placeholder {
+  background: linear-gradient(90deg, #1e293b 25%, #334155 50%, #1e293b 75%) !important;
+}
+
+/* ========== DIVIDERS & SEPARATORS ========== */
+.dark-mode hr,
+.dark-mode .divider,
+.dark-mode .separator {
+  border-color: #334155 !important;
+  background-color: #334155 !important;
+}
+
+/* ========== DASHBOARD SPECIFIC COMPONENTS ========== */
+/* Welcome Section */
+.dark-mode .welcome-section {
+  background: linear-gradient(135deg, #1e293b 0%, #334155 100%) !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .welcome-section h1 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .welcome-section p {
+  color: #94a3b8 !important;
+}
+
+/* Stat Cards */
+.dark-mode .stat-card {
+  background: #1e293b !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .stat-label {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .stat-value {
+  color: #f1f5f9 !important;
+}
+
+/* Level Card */
+.dark-mode .level-card {
+  background: #1e293b !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .level-info h2 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .level-info p,
+.dark-mode .level-subtitle {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .progress-label {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .progress-percent {
+  color: #4ECDC4 !important;
+}
+
+.dark-mode .next-level-hint {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(8, 145, 178, 0.2)) !important;
+  border-left-color: #7c3aed !important;
+}
+
+.dark-mode .next-level-hint h3 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .next-level-hint p {
+  color: #94a3b8 !important;
+}
+
+/* Activities Card */
+.dark-mode .activities-card {
+  background: #1e293b !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .activities-card h3 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .activity-item {
+  background: #334155 !important;
+  border: 1px solid #475569 !important;
+}
+
+.dark-mode .activity-item:hover {
+  background: #475569 !important;
+}
+
+.dark-mode .activity-title {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .activity-reward {
+  color: #4ECDC4 !important;
+}
+
+.dark-mode .activity-arrow {
+  color: #94a3b8 !important;
+}
+
+/* Games Section */
+.dark-mode .games-section {
+  background: #1e293b !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .section-header h2 {
+  color: #f1f5f9 !important;
+}
+
+/* Game Cards */
+.dark-mode .game-card {
+  background: #334155 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .game-card:hover {
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.4) !important;
+}
+
+.dark-mode .game-title {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .game-description {
+  color: #94a3b8 !important;
+}
+
+/* Achievements Section */
+.dark-mode .achievements-section {
+  background: #1e293b !important;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .achievements-section h3 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .achievement {
+  background: #334155 !important;
+  border: 1px solid #475569 !important;
+}
+
+.dark-mode .achievement.locked {
+  background: #1e293b !important;
+  opacity: 0.6;
+}
+
+.dark-mode .achievement-name {
+  color: #f1f5f9 !important;
+}
+
+/* Module Card Titles (for light colored text) */
+.dark-mode .module-title,
+.dark-mode .card-title,
+.dark-mode [class*="title"] {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .module-description,
+.dark-mode .card-description,
+.dark-mode [class*="description"] {
+  color: #94a3b8 !important;
+}
+
+/* Fix for any remaining white backgrounds */
+.dark-mode [style*="background: white"],
+.dark-mode [style*="background:white"],
+.dark-mode [style*="background-color: white"],
+.dark-mode [style*="background-color:white"] {
+  background: #1e293b !important;
+}
+
+/* ========== HIGH SPECIFICITY OVERRIDES FOR SCOPED CSS ========== */
+/* These use html.dark-mode for higher specificity to override Vue scoped styles */
+
+html.dark-mode .welcome-section,
+html.dark-mode .stat-card,
+html.dark-mode .level-card,
+html.dark-mode .activities-card,
+html.dark-mode .games-section,
+html.dark-mode .achievements-section,
+html.dark-mode .game-card {
+  background: #1e293b !important;
+  background-color: #1e293b !important;
+}
+
+html.dark-mode .achievement-badge {
+  background: transparent !important;
+  background-color: transparent !important;
+}
+
+html.dark-mode .achievement-badge.locked {
+  opacity: 0.5;
+}
+
+html.dark-mode .achievements-grid {
+  background: transparent !important;
+}
+
+/* Fix white halo/ring around all achievement icons */
+html.dark-mode .achievement-icon {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+}
+
+html.dark-mode .achievement-badge:nth-child(1) .achievement-icon {
+  box-shadow: 0 8px 25px rgba(255, 165, 0, 0.3) !important;
+}
+
+html.dark-mode .achievement-badge:nth-child(2) .achievement-icon {
+  box-shadow: 0 8px 25px rgba(78, 205, 196, 0.3) !important;
+}
+
+html.dark-mode .achievement-badge:nth-child(3) .achievement-icon {
+  box-shadow: 0 8px 25px rgba(255, 107, 107, 0.3) !important;
+}
+
+html.dark-mode .achievement-badge:nth-child(4) .achievement-icon {
+  box-shadow: 0 8px 25px rgba(168, 230, 207, 0.3) !important;
+}
+
+html.dark-mode .achievement-badge.locked .achievement-icon {
+  background: #334155 !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3) !important;
+}
+
+html.dark-mode .next-level-info {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(8, 145, 178, 0.2)) !important;
+}
+
+html.dark-mode .activity-item {
+  background: linear-gradient(to right, #334155, #475569) !important;
+}
+
+html.dark-mode .game-card {
+  background: linear-gradient(to bottom right, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+}
+
+/* Text colors with high specificity */
+html.dark-mode .level-info h2,
+html.dark-mode .activities-card h3,
+html.dark-mode .game-title,
+html.dark-mode .activity-title,
+html.dark-mode .achievement-name,
+html.dark-mode .progress-label,
+html.dark-mode .next-level-info h3 {
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+html.dark-mode .level-info p,
+html.dark-mode .game-description,
+html.dark-mode .activity-reward,
+html.dark-mode .next-level-info p {
+  color: #94a3b8 !important;
+}
+
+/* ========== SMOOTH TRANSITIONS ========== */
+body,
+html,
+#app,
+#game-layout-container,
+.game-layout,
+.sidebar,
+.app-header,
+.card,
+.settings-card,
+.settings-header,
+.setting-item,
+.dropdown-menu,
+.dropdown-item,
+.modal,
+.popup,
+input,
+textarea,
+select {
+  transition: background-color 0.3s ease,
+    color 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease;
+}

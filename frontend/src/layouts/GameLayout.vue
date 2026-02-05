@@ -1,5 +1,5 @@
 <script setup>
-import { computed } from 'vue'
+import { computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import AppHeader from '@/core/components/AppHeader.vue'
 import AppSidebar from '@/core/components/AppSidebar.vue'
@@ -11,8 +11,17 @@ const route = useRoute()
 
 // Vistas que usan el layout sin sidebar (diseño limpio)
 const hideSidebar = computed(() => 
-  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco' || route.name === 'presupuesto-brote' || route.name === 'perfil'
+  route.name === 'dashboard' || route.name === 'lecciones' || route.name === 'kiosco' || route.name === 'presupuesto-brote' || route.name === 'perfil' || route.name === 'configuracion'
 )
+
+// Initialize dark mode on layout load
+onMounted(() => {
+  const savedDarkMode = localStorage.getItem('darkMode')
+  if (savedDarkMode === 'true') {
+    document.documentElement.classList.add('dark-mode')
+    document.body.classList.add('dark-mode')
+  }
+})
 </script>
 
 <template>

@@ -749,3 +749,69 @@ function navigateToGame(routeName) {
   }
 }
 </style>
+
+<!-- Non-scoped dark mode styles to override scoped CSS -->
+<style>
+html.dark-mode .dashboard-container .welcome-section,
+html.dark-mode .dashboard-container .stat-card,
+html.dark-mode .dashboard-container .level-card,
+html.dark-mode .dashboard-container .activities-card,
+html.dark-mode .dashboard-container .games-section,
+html.dark-mode .dashboard-container .achievements-section {
+  background: #1e293b !important;
+}
+
+html.dark-mode .dashboard-container .game-card {
+  background: linear-gradient(to bottom right, #1e293b, #334155) !important;
+  border-color: #475569 !important;
+}
+
+html.dark-mode .dashboard-container .next-level-info {
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.2), rgba(8, 145, 178, 0.2)) !important;
+}
+
+html.dark-mode .dashboard-container .activity-item {
+  background: linear-gradient(to right, #334155, #475569) !important;
+}
+
+html.dark-mode .dashboard-container .achievement-badge {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  outline: none !important;
+}
+
+html.dark-mode .dashboard-container .achievement-badge.locked .achievement-icon {
+  background: #334155 !important;
+}
+
+html.dark-mode .dashboard-container .stat-label,
+html.dark-mode .dashboard-container .level-info p,
+html.dark-mode .dashboard-container .game-description,
+html.dark-mode .dashboard-container .activity-reward,
+html.dark-mode .dashboard-container .next-level-info p {
+  color: #94a3b8 !important;
+}
+
+html.dark-mode .dashboard-container .stat-value,
+html.dark-mode .dashboard-container .level-info h2,
+html.dark-mode .dashboard-container .activities-card h3,
+html.dark-mode .dashboard-container .game-title,
+html.dark-mode .dashboard-container .activity-title,
+html.dark-mode .dashboard-container .achievement-name,
+html.dark-mode .dashboard-container .progress-label,
+html.dark-mode .dashboard-container .next-level-info h3 {
+  color: #f1f5f9 !important;
+  -webkit-text-fill-color: #f1f5f9 !important;
+}
+
+html.dark-mode .dashboard-container .achievement-badge.locked .achievement-name {
+  color: #64748b !important;
+}
+
+html.dark-mode .dashboard-container .progress-bar {
+  background: #334155 !important;
+}
+</style>
+

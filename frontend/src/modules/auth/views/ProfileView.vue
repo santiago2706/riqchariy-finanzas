@@ -106,7 +106,7 @@ const handleLogout = () => auth.logout()
           </div>
           <div class="info-item">
             <span class="info-label">Región</span>
-            <span class="info-value">🇵🇪 {{ userRegion }}</span>
+            <span class="info-value">🦙 {{ userRegion }}</span>
           </div>
           <div class="info-item">
             <span class="info-label">Nivel Actual</span>

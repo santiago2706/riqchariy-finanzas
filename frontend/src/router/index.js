@@ -34,7 +34,10 @@ import RetosView from '@/modules/learning/views/RetosView.vue';
 import PresupuestoView from '@/modules/budgeting/views/PresupuestoView.vue';
 
 // Profile
-import ProfileView from '@/modules/auth/views/ProfileView.vue';
+import ProfileView from '@/modules/auth/views/ProfileView.vue'
+
+// Settings
+import SettingsView from '@/modules/auth/views/SettingsView.vue';
 
 // Store
 import { useAuthStore } from '@/modules/auth/store/useAuthStore.js';
@@ -80,6 +83,7 @@ const router = createRouter({
         { path: 'retos-gestion', name: 'retos-gestion', component: RetosView },
         { path: 'estadisticas', name: 'estadisticas-colegio', component: EstadisticasView },
         { path: 'perfil', name: 'perfil', component: ProfileView },
+        { path: 'configuracion', name: 'configuracion', component: SettingsView },
       ]
     },
 
