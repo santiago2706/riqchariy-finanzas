@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { useRouter } from 'vue-router';
 import InputModal from '@/core/components/InputModal.vue';
+import { useToast } from '@/core/composables/useToast';
 
 const router = useRouter();
 
@@ -53,6 +54,7 @@ const educationalMessage = computed(() => {
 
 // --- FUNCIONES DE INTERACCIÓN ---
 const handleCostSubmit = (type, costData) => {
+    const toast = useToast();
     if (costData.name && !isNaN(costData.amount) && costData.amount > 0) {
         const amount = parseFloat(costData.amount.toFixed(2));
         const newCost = { id: Date.now(), name: costData.name, amount: amount };
@@ -60,29 +62,35 @@ const handleCostSubmit = (type, costData) => {
         if (type === 'fixed') {
             fixedCosts.value.push(newCost);
             showFixedModal.value = false;
+            toast.success(`Costo fijo "${costData.name}" añadido ✅`);
         } else {
             variableCosts.value.push(newCost);
             showVariableModal.value = false;
+            toast.success(`Costo variable "${costData.name}" añadido ✅`);
         }
     }
 };
 
 const removeCost = (type, id) => {
+    const toast = useToast();
     if (confirm('¿Estás seguro de eliminar este costo?')) {
         if (type === 'fixed') {
             fixedCosts.value = fixedCosts.value.filter(cost => cost.id !== id);
         } else {
             variableCosts.value = variableCosts.value.filter(cost => cost.id !== id);
         }
+        toast.info('Costo eliminado 🗑️');
     }
 };
 
 const setMetaAhorro = () => {
+    const toast = useToast();
     const newMeta = parseFloat(prompt('Ingresa tu nueva Meta de Ahorro (ej. 150.00):'));
     if (!isNaN(newMeta) && newMeta >= 0) {
         metaAhorro.value = parseFloat(newMeta.toFixed(2));
+        toast.success(`Meta de ahorro actualizada a S/${newMeta.toFixed(2)} 🎯`);
     } else {
-        alert('Monto ingresado no válido.');
+        toast.error('Monto ingresado no válido.');
     }
 };
 

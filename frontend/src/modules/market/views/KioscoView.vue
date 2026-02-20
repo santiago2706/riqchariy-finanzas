@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useKioscoStore } from '../store/useKioscoStore';
 import { useMarketStore } from '../store/useMarketStore';
 import ProductCard from '../components/ProductCard.vue';
+import { useToast } from '@/core/composables/useToast';
 
 const router = useRouter();
 const kiosco = useKioscoStore();
@@ -23,12 +24,15 @@ function venderProductoDesdeEstante(product) {
   if (itemInInventory) {
     kiosco.sellProduct(itemInInventory, 1);
   } else {
-    console.log("¡No tienes este producto en tu inventario para vender!");
+    const toast = useToast();
+    toast.warning('¡No tienes este producto en tu inventario!');
   }
 }
 
 async function handleAdvanceDay() {
   await market.advanceDay();
+  const toast = useToast();
+  toast.info(`¡Día ${kiosco.currentDay} completado! Los precios del mercado han cambiado 📊`);
 }
 
 function goToDashboard() {

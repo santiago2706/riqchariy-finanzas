@@ -2,6 +2,7 @@
 import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/modules/auth/store/useAuthStore'
+import { useToast } from '@/core/composables/useToast'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -39,6 +40,8 @@ const applyDarkMode = (isDark) => {
 // Watch for dark mode changes - apply immediately
 watch(() => preferences.value.darkMode, (newValue) => {
   applyDarkMode(newValue)
+  const toast = useToast()
+  toast.info(newValue ? 'Modo oscuro activado 🌙' : 'Modo claro activado ☀️')
 })
 
 // Load saved preferences on mount
