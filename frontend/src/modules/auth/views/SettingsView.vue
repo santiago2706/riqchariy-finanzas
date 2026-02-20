@@ -3,6 +3,7 @@ import { ref, computed, watch, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/modules/auth/store/useAuthStore'
 import { useToast } from '@/core/composables/useToast'
+import { useSound } from '@/core/composables/useSound'
 
 const router = useRouter()
 const auth = useAuthStore()
@@ -41,7 +42,20 @@ const applyDarkMode = (isDark) => {
 watch(() => preferences.value.darkMode, (newValue) => {
   applyDarkMode(newValue)
   const toast = useToast()
+  const sound = useSound()
+  sound.click()
   toast.info(newValue ? 'Modo oscuro activado 🌙' : 'Modo claro activado ☀️')
+})
+
+// Watch for sound preference changes - persist to localStorage
+watch(() => preferences.value.sound, (newValue) => {
+  localStorage.setItem('soundEnabled', newValue ? 'true' : 'false')
+  const toast = useToast()
+  if (newValue) {
+    const sound = useSound()
+    sound.notify()
+  }
+  toast.info(newValue ? 'Sonido activado 🔊' : 'Sonido silenciado 🔇')
 })
 
 // Load saved preferences on mount
@@ -50,6 +64,10 @@ onMounted(() => {
   if (savedDarkMode === 'true') {
     preferences.value.darkMode = true
     applyDarkMode(true)
+  }
+  const savedSound = localStorage.getItem('soundEnabled')
+  if (savedSound === 'false') {
+    preferences.value.sound = false
   }
 })
 

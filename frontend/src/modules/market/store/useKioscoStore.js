@@ -2,6 +2,7 @@
 import { ref, computed } from 'vue';
 import { defineStore } from 'pinia';
 import { useToast } from '@/core/composables/useToast';
+import { useSound } from '@/core/composables/useSound';
 // NOTA IMPORTANTE: Se debe importar fetchProductsByRegion desde marketApi.js
 // o donde se encuentre la lógica de API real.
 // Si 'fetchProductsByRegion' no está definida, es crucial definirla o importarla.
@@ -55,11 +56,13 @@ export const useKioscoStore = defineStore('kiosco', () => {
     }
     async function buyProduct(product, quantity = 1) {
         const toast = useToast();
+        const sound = useSound();
         // ✨ SOLUCIÓN AL BUCLE DE DEPENDENCIA: Importación dinámica
         const marketStore = (await import('./useMarketStore')).useMarketStore();
         const currentMarketProduct = marketStore.products.find(p => p.id === product.id);
         if (!currentMarketProduct) {
             toast.error('Producto no encontrado en el mercado.');
+            sound.error();
             return false;
         }
         const cost = currentMarketProduct.cost * quantity;
@@ -73,20 +76,24 @@ export const useKioscoStore = defineStore('kiosco', () => {
                 inventory.value.push({ product: { ...currentMarketProduct }, quantity });
             }
             toast.success(`¡${product.name} comprado por S/${cost.toFixed(2)}! 📭`);
+            sound.coin();
             return true;
         } else {
             toast.warning('¡Saldo insuficiente! Vende productos para obtener más monedas.');
+            sound.warning();
             return false;
         }
     }
     async function sellProduct(itemToSell, quantity = 1) {
         const toast = useToast();
+        const sound = useSound();
         const productInInventory = itemToSell.product;
         // ✨ SOLUCIÓN AL BUCLE DE DEPENDENCIA: Importación dinámica
         const marketStore = (await import('./useMarketStore')).useMarketStore();
         const currentMarketProduct = marketStore.products.find(p => p.id === productInInventory.id);
         if (!currentMarketProduct) {
             toast.error('¡Este producto ya no existe en el mercado!');
+            sound.error();
             return false;
         }
         // Usamos el precio de VENTA (price) del mercado actual
@@ -99,9 +106,11 @@ export const useKioscoStore = defineStore('kiosco', () => {
                 inventory.value = inventory.value.filter(item => item.product.id !== productInInventory.id);
             }
             toast.success(`¡${productInInventory.name} vendido por S/${revenue.toFixed(2)}! 💰`);
+            sound.cash();
             return true;
         } else {
             toast.warning('No tienes suficiente inventario para vender.');
+            sound.warning();
             return false;
         }
     }
