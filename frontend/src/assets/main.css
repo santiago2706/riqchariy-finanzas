@@ -1195,6 +1195,69 @@ select {
     box-shadow 0.3s ease;
 }
 
+/* ========== INPUT MODAL — Dark Mode ========== */
+.dark-mode .bg-white.p-8.rounded-xl {
+  background: #1e293b !important;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5) !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl h2 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl p {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl label {
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl input {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl input::placeholder {
+  color: #64748b !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl button[type="button"] {
+  background: #334155 !important;
+  border-color: #475569 !important;
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .bg-white.p-8.rounded-xl button[type="button"]:hover {
+  background: #475569 !important;
+}
+
+/* ========== TOAST NOTIFICATIONS — Dark Mode ========== */
+.dark-mode .toast-success {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.2), rgba(40, 167, 69, 0.1)) !important;
+  color: #86efac !important;
+  border-left-color: #22c55e !important;
+}
+
+.dark-mode .toast-error {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.2), rgba(220, 53, 69, 0.1)) !important;
+  color: #fca5a5 !important;
+  border-left-color: #ef4444 !important;
+}
+
+.dark-mode .toast-info {
+  background: linear-gradient(135deg, rgba(23, 162, 184, 0.2), rgba(23, 162, 184, 0.1)) !important;
+  color: #7dd3fc !important;
+  border-left-color: #0ea5e9 !important;
+}
+
+.dark-mode .toast-warning {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2), rgba(255, 193, 7, 0.1)) !important;
+  color: #fde68a !important;
+  border-left-color: #f59e0b !important;
+}
+
 /* ========== PAGE TRANSITIONS ========== */
 .page-enter-active,
 .page-leave-active {

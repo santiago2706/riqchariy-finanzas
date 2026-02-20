@@ -5,6 +5,7 @@ import AppHeader from '@/core/components/AppHeader.vue'
 import AppSidebar from '@/core/components/AppSidebar.vue'
 import MarketEventPopup from '@/modules/market/components/MarketEventPopup.vue'
 import ChatbotWindow from '@/core/components/ChatbotWindow.vue'
+import ToastContainer from '@/core/components/ToastContainer.vue'
 import { RouterView } from 'vue-router'
 
 const route = useRoute()
@@ -43,6 +44,7 @@ onMounted(() => {
 
     <MarketEventPopup />
     <ChatbotWindow />
+    <ToastContainer />
   </div>
 </template>
 
