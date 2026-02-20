@@ -33,7 +33,11 @@ onMounted(() => {
 
     <main :class="hideSidebar ? 'main-clean' : 'main-with-sidebar'">
       <div class="content-wrapper">
-        <RouterView />
+        <RouterView v-slot="{ Component }">
+          <Transition name="page" mode="out-in">
+            <component :is="Component" />
+          </Transition>
+        </RouterView>
       </div>
     </main>
 
