@@ -212,7 +212,7 @@
                 <li>Interés simple y compuesto</li>
                 <li>Concepto de crédito y TCEA</li>
                 <li>Simulador "Mi Primera Chamba"</li>
-                <li>Asistente IA "YACHAQ"</li>
+                <li>Asistente IA "PATO"</li>
               </ul>
             </div>
             <div class="level-card">

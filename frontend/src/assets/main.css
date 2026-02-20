@@ -644,14 +644,229 @@
 }
 
 .dark-mode .chat-message,
-.dark-mode .message-bubble {
+.dark-mode .message-bubble,
+.dark-mode .bubble-bot-dark {
   background: #334155 !important;
   color: #f1f5f9 !important;
 }
 
-.dark-mode .chat-input {
+.dark-mode .chat-input,
+.dark-mode .input-dark {
   background: #334155 !important;
+  border-color: #475569 !important;
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .chat-input-area,
+.dark-mode .input-area-dark {
+  background: #1e293b !important;
   border-top: 1px solid #475569 !important;
+}
+
+.dark-mode .chat-history,
+.dark-mode .bg-history-dark {
+  background: #0f172a !important;
+}
+
+.dark-mode .chatbot-fab {
+  box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.5),
+    0 0 15px rgba(124, 58, 237, 0.3) !important;
+}
+
+/* ========== LECCIONES / KIOSCO / PRESUPUESTO — Dark Mode ========== */
+
+/* --- Shared: page-header, stat-box, section backgrounds --- */
+.dark-mode .page-header {
+  background: #1e293b !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .stat-box {
+  background: linear-gradient(to right, #1e293b, #334155) !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .stat-box.day-box {
+  background: linear-gradient(to right, #1e3a5f, #1e293b) !important;
+}
+
+.dark-mode .stat-box.warning-box {
+  background: linear-gradient(to right, #3b1a1a, #2d1515) !important;
+}
+
+.dark-mode .stat-box.profit-box {
+  background: linear-gradient(to right, #1a3b2a, #15302a) !important;
+}
+
+.dark-mode .stat-value {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .stat-label {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .subtitle,
+.dark-mode .region-text,
+.dark-mode .subtitle-text,
+.dark-mode .header-description {
+  color: #94a3b8 !important;
+}
+
+/* --- Lecciones --- */
+.dark-mode .topics-card {
+  background: #1e293b !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .topics-card h2 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .topic-item {
+  background: linear-gradient(to right, #0f172a, #1e293b) !important;
+  border-color: #334155 !important;
+}
+
+.dark-mode .topic-item:hover {
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .topic-item.topic-active {
+  background: linear-gradient(to right, #1e3a5f, #1a3350) !important;
+  border-color: #667eea !important;
+}
+
+.dark-mode .topic-title {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .topic-level {
+  background: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+.dark-mode .document-card {
+  background: #1e293b !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .document-header h2 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .document-content {
+  background: linear-gradient(to right, #0f172a, #1e293b) !important;
+}
+
+.dark-mode .document-content p {
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .tutor-card {
+  background: #1e293b !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .tutor-header h2 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .tutor-content {
+  background: linear-gradient(to right, #2d2600, #1e293b) !important;
+}
+
+.dark-mode .summary-content p {
+  color: #cbd5e1 !important;
+}
+
+/* --- Kiosco --- */
+.dark-mode .controls-section {
+  background: #1e293b !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .products-section,
+.dark-mode .inventory-section {
+  background: #1e293b !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .section-header p {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .inventory-item {
+  background: linear-gradient(to right, #1e293b, #334155) !important;
+}
+
+.dark-mode .item-name {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .item-cost {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .empty-state,
+.dark-mode .empty-inventory {
+  color: #64748b !important;
+}
+
+.dark-mode .loading-state {
+  color: #94a3b8 !important;
+}
+
+/* --- Presupuesto --- */
+.dark-mode .advisor-section .speech-bubble {
+  background: #1e293b !important;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3) !important;
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .panel-section {
+  background: #1e293b !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark-mode .section-header-panel h3 {
+  color: #f1f5f9 !important;
+}
+
+.dark-mode .section-desc {
+  color: #64748b !important;
+}
+
+.dark-mode .cost-item {
+  border-bottom-color: #334155 !important;
+}
+
+.dark-mode .cost-name {
+  color: #cbd5e1 !important;
+}
+
+.dark-mode .amount-badge.red {
+  background: rgba(254, 202, 202, 0.1) !important;
+}
+
+.dark-mode .amount-badge.yellow {
+  background: rgba(254, 240, 138, 0.1) !important;
+}
+
+.dark-mode .analysis-header {
+  color: #94a3b8 !important;
+}
+
+.dark-mode .analysis-desc {
+  color: #64748b !important;
+}
+
+.dark-mode .divider {
+  background: #334155 !important;
+}
+
+.dark-mode .empty-list {
+  color: #475569 !important;
 }
 
 /* ========== SCROLLBARS ========== */

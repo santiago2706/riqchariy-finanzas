@@ -30,7 +30,7 @@ const fetchSummaryFromIA = async (content) => {
     await new Promise(resolve => setTimeout(resolve, 1500));
 
     // Simulación de la respuesta de la IA (adaptada al contenido actual)
-    const summary = `**Resumen de YACHAQ:** Para el nivel **${activeTopic.value.level}**, la lección sobre "${activeTopic.value.title}" enfatiza: ${content.substring(0, 80)}... La clave es la disciplina en el ahorro y la inversión.`;
+    const summary = `**Resumen de Pato:** Para el nivel **${activeTopic.value.level}**, la lección sobre "${activeTopic.value.title}" enfatiza: ${content.substring(0, 80)}... La clave es la disciplina en el ahorro y la inversión.`;
 
     isLoading.value = false;
     return summary;
@@ -124,7 +124,7 @@ onMounted(async () => {
                 <div class="tutor-card">
                     <div class="tutor-header">
                         <span class="tutor-icon">🤖</span>
-                        <h2>Tutor YACHAQ: Resumen IA</h2>
+                        <h2>Tutor Pato: Resumen IA</h2>
                     </div>
                     <div class="tutor-content">
                         <div v-if="isLoading" class="loading-state">

@@ -2,7 +2,7 @@
 import apiClient from "./apiClient";
 
 /**
- * Consulta al modelo de IA adaptativo (YACHAQ)
+ * Consulta al modelo de IA adaptativo (Pato)
  * @param {string} prompt Texto o pregunta del usuario
  */
 export const fetchBotResponse = async (prompt) => {

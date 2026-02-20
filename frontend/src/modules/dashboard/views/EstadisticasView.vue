@@ -10,7 +10,7 @@ const reportes = [
     { title: 'Comparativa por Docente', description: 'Rendimiento promedio de patrimonio y calificaciones por cada profesor.', icon: '🧑‍🏫', route: { name: 'reporte-profesores' } },
     { title: 'Análisis de Aulas', description: 'Identifica los grupos con el mayor y menor avance pedagógico. Monitoreo por aula.', icon: '🏫', route: { name: 'reporte-aulas' } },
     { title: 'Impacto de Retos', description: 'Evalúa cómo los Retos Personalizados afectan el rendimiento del estudiante.', icon: '📈', route: { name: 'reporte-retos' } },
-    { title: 'Distribución de Calificaciones', description: 'Consistencia de las notas generadas por la IA (YACHAQ) a nivel institucional.', icon: '⭐', route: { name: 'reporte-ia' } },
+    { title: 'Distribución de Calificaciones', description: 'Consistencia de las notas generadas por la IA (Pato) a nivel institucional.', icon: '⭐', route: { name: 'reporte-ia' } },
 ];
 </script>
 

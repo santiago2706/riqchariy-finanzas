@@ -13,8 +13,6 @@ export const useChatbotStore = defineStore('chatbot', () => {
     // --- CONFIGURACIÓN DEL BOT ---
     // Usamos 'bot' como sender para el frontend, pero este es el nombre visible.
     const VISIBLE_BOT_NAME = 'Pato';
-    // Nombre del bot usado anteriormente en mensajes genéricos/de error.
-    const LEGACY_BOT_NAME = 'YACHAQ';
 
     // --- ESTADO ---
     const isOpen = ref(false);
@@ -77,6 +75,34 @@ export const useChatbotStore = defineStore('chatbot', () => {
         }
     }
 
+    /**
+     * Saludo personalizado al iniciar sesión.
+     * Abre el chatbot y muestra un mensaje de bienvenida con el nombre del usuario.
+     */
+    function greetUser(userName) {
+        const hour = new Date().getHours();
+        let greeting;
+        if (hour < 12) {
+            greeting = '¡Buenos días';
+        } else if (hour < 18) {
+            greeting = '¡Buenas tardes';
+        } else {
+            greeting = '¡Buenas noches';
+        }
+
+        const welcomeMsg = `${greeting}, ${userName}! 👋 Soy ${VISIBLE_BOT_NAME}, tu tutor financiero. ¿Listo para aprender hoy? 🚀`;
+
+        // Abre el chatbot automáticamente
+        isOpen.value = true;
+
+        // Agrega el mensaje de bienvenida al inicio
+        messages.value = [{
+            id: messageId++,
+            sender: 'bot',
+            text: welcomeMsg
+        }, ...messages.value];
+    }
+
     // --- DEVOLUCIÓN ---
     return {
         isOpen,
@@ -84,6 +110,7 @@ export const useChatbotStore = defineStore('chatbot', () => {
         messages,
         toggleChat,
         sendMessage,
-        resetChat
+        resetChat,
+        greetUser
     };
 });

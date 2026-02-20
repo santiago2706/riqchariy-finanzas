@@ -174,10 +174,10 @@ const handleEnviarReto = (alumnoNombre) => {
 
         <div v-if="userRole === 'Colegio'" class="mt-10 p-6 bg-white rounded-xl shadow-lg border-t-4 border-yellow-500">
             <h2 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                🤖 YACHAQ - Módulo Estadístico Institucional
+                🤖 PATO - Módulo Estadístico Institucional
             </h2>
             <p class="text-gray-600 mb-4">
-                Pregúntale a YACHAQ sobre el rendimiento del colegio, comparativas de aulas o el impacto de un reto global.
+                Pregúntale a Pato sobre el rendimiento del colegio, comparativas de aulas o el impacto de un reto global.
             </p>
             <textarea placeholder="Ej: ¿Qué aula tiene el peor desempeño en el módulo 'Fondo de Emergencia'?"
                       class="w-full p-3 border border-gray-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500" rows="3"></textarea>
